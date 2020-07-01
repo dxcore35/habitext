@@ -70,7 +70,7 @@ def expand_datechunks(date_chunk):
     given a date chunk
     """
     date = pd.to_datetime(date_chunk[0][2:])
-    day_of_week = int(date.strftime('%w'))
+    day_of_week = date.strftime('%a')
     week = int(date.strftime("%U"))
     metric = day_time_total(date_chunk)
 
