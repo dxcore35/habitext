@@ -119,12 +119,12 @@ def split_DataFrame(df):
 
     return dfList
 
-def create_heatmap(df):
+def create_heatmap(df, color_low, color_high):
     """ Returns tile plot created from the given dataframe
     """
     plt = (ggplot(df, aes(x = 'Week', y = 'Day', fill = 'Metric'))
         + geom_tile()
-        + scale_fill_gradient(low = "white", high = "green")
+        + scale_fill_gradient(low = color_low, high = color_high)
         + ggtitle(df['Name'][0])
         + theme(text=element_text(family='MS Gothic')))
 
@@ -163,6 +163,8 @@ def main():
     # Directories need to exist
     habit_dir = "C:/Files/Repos/habits/"
     save_dir = "C:/Files/Repos/habits/reports/"
+    color_low = "white"
+    color_high = "green"
 
     habitlist = md_file_list(habit_dir)
 
@@ -172,7 +174,7 @@ def main():
     plotlist = []
 
     for df in dfList:
-        plt = create_heatmap(df)
+        plt = create_heatmap(df, color_low, color_high)
         file = df['Name'][0] + '.png'
         ggsave(filename=save_dir+file, plot=plt, device = 'png', dpi=300)
         plotlist.append(save_dir+file)
