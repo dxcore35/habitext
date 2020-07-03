@@ -130,6 +130,26 @@ def create_heatmap(df, color_low, color_high, font):
 
     return plt
 
+def create_bar_metric(df):
+    """ Returns bar plot with mean value of metric
+    by day of week
+    """
+    mean_by_day = df.groupby(['Day'])['Metric'].mean()
+    df2 = pd.DataFrame({'Day' : mean_by_day.index,
+                        'Mean' : mean_by_day.values})
+
+    order = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    df2['Day of Week'] = pd.Categorical(df2['Day'],
+                                        categories = order,
+                                        ordered = True)
+
+    plt = (ggplot(pd.DataFrame(df2), aes(x = 'Day of Week', y = 'Mean'))
+        + geom_col()
+        + ggtitle('Mean time by Day of Week')
+        + theme_bw())
+
+    return plt
+
 def get_date():
     """ Return date in yyyymmdd format
     """
@@ -176,7 +196,12 @@ def main():
 
     for df in dfList:
         plt = create_heatmap(df, color_low, color_high, font)
-        file = df['Name'][0] + '.png'
+        file = df['Name'][0] + '_heatmap' + '.png'
+        ggsave(filename=save_dir+file, plot=plt, device = 'png', dpi=300)
+        plotlist.append(save_dir+file)
+
+        plt = create_bar_metric(df)
+        file = df['Name'][0] + '_bar' + '.png'
         ggsave(filename=save_dir+file, plot=plt, device = 'png', dpi=300)
         plotlist.append(save_dir+file)
 
