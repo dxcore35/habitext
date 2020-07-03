@@ -5,6 +5,8 @@ from datetime import datetime
 from reportlab.pdfgen import canvas
 from reportlab.lib import utils
 from reportlab.platypus import Image
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.cidfonts import UnicodeCIDFont
 
 def md_file_list(dir):
     """ Returns list with file names of all markdown files
@@ -158,16 +160,19 @@ def get_date():
 def create_pdf(plotlist, dir):
     """ Create pdf with images in plotlist
     """
+    pdfmetrics.registerFont(UnicodeCIDFont('HeiseiMin-W3'))
     c = canvas.Canvas(dir + get_date() + '_habits.pdf')
 
     for plot in plotlist:
-        img = utils.ImageReader(plot)
+        img = utils.ImageReader(plot[0])
         img_width, img_height = img.getSize()
         aspect = img_height / float (img_width)
         x_pos = 1
         y_pos = 300
         scale = 500
-        c.drawImage(plot,
+        c.setFont('HeiseiMin-W3', 16)
+        c.drawString(250, 800, plot[1])
+        c.drawImage(plot[0],
                     x_pos,
                     y_pos,
                     width = scale,
@@ -196,14 +201,16 @@ def main():
 
     for df in dfList:
         plt = create_heatmap(df, color_low, color_high, font)
-        file = df['Name'][0] + '_heatmap' + '.png'
+        habit_name = df['Name'][0]
+        file = habit_name + '_heatmap' + '.png'
         ggsave(filename=save_dir+file, plot=plt, device = 'png', dpi=300)
-        plotlist.append(save_dir+file)
+        plotlist.append((save_dir+file, habit_name))
 
         plt = create_bar_metric(df)
-        file = df['Name'][0] + '_bar' + '.png'
+        habit_name = df['Name'][0]
+        file = habit_name + '_bar' + '.png'
         ggsave(filename=save_dir+file, plot=plt, device = 'png', dpi=300)
-        plotlist.append(save_dir+file)
+        plotlist.append((save_dir+file, habit_name))
 
     create_pdf(plotlist, save_dir)
    
