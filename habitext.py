@@ -163,18 +163,24 @@ def create_pdf(plotlist, dir):
     pdfmetrics.registerFont(UnicodeCIDFont('HeiseiMin-W3'))
     c = canvas.Canvas(dir + get_date() + '_habits.pdf')
 
-    for plot in plotlist:
-        img = utils.ImageReader(plot[0])
+    for plot1, plot2 in zip(plotlist[0::2], plotlist[1::2]):
+        img = utils.ImageReader(plot1[0])
         img_width, img_height = img.getSize()
         aspect = img_height / float (img_width)
         x_pos = 1
-        y_pos = 300
+        y_pos1 = 400
+        y_pos2 = 50
         scale = 500
         c.setFont('HeiseiMin-W3', 16)
-        c.drawString(250, 800, plot[1])
-        c.drawImage(plot[0],
+        c.drawString(250, 800, plot1[1])
+        c.drawImage(plot1[0],
                     x_pos,
-                    y_pos,
+                    y_pos1,
+                    width = scale,
+                    height = scale * aspect)
+        c.drawImage(plot2[0],
+                    x_pos,
+                    y_pos2,
                     width = scale,
                     height = scale * aspect)
         c.showPage()
