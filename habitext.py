@@ -158,6 +158,15 @@ def get_date():
     """
     return datetime.today().strftime('%Y%m%d')
 
+def delete_files(file_list):
+    """ Deletes files in file_list
+    """
+    for file in file_list:
+        try:
+            os.remove(file[0])
+        except OSError as e:
+            print("Error: %s - %s." % (e.filename, e.strerror))
+
 def create_pdf(plotlist, dir):
     """ Create pdf with images in plotlist
     """
@@ -220,6 +229,7 @@ def main():
         plotlist.append((save_dir+file, habit_name))
 
     create_pdf(plotlist, save_dir)
+    delete_files(plotlist)
    
 
 if __name__ == '__main__':
