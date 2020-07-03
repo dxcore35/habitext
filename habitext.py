@@ -125,9 +125,10 @@ def create_heatmap(df, color_low, color_high, font):
     """ Returns tile plot created from the given dataframe
     """
     plt = (ggplot(df, aes(x = 'Week', y = 'Day', fill = 'Metric'))
-        + geom_tile()
+        + geom_tile(aes(width = 0.95, height = 0.95))
         + scale_fill_gradient(low = color_low, high = color_high)
         + ggtitle(df['Name'][0])
+        + theme_bw()
         + theme(text=element_text(family=font)))
 
     return plt
@@ -194,7 +195,7 @@ def main():
     # Directories need to exist
     habit_dir = "C:/Files/Repos/habits/"
     save_dir = "C:/Files/Repos/habits/reports/"
-    color_low = "white"
+    color_low = "lightgray"
     color_high = "green"
     font = "MS Gothic"
 
