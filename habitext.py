@@ -202,11 +202,11 @@ def main():
     by habit name, create plots, and add plots to PDF
     """
     # Directories need to exist
-    habit_dir = "C:/Files/Repos/habits/"
-    save_dir = "C:/Files/Repos/habits/reports/"
+    habit_dir = "/habits/"
+    save_dir = "/habits/reports/"
     color_low = "lightgray"
     color_high = "green"
-    font = "MS Gothic"
+    font = "Noto Sans CJK JP"
 
     habitlist = md_file_list(habit_dir)
 
