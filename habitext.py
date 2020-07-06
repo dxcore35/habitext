@@ -67,6 +67,9 @@ def chunk_by_date(log):
 
     return date_chunks_list
 
+def text_after_bullet(s):
+    return s.partition('- ')[2]
+
 def expand_datechunks(date_chunk):
     """ Returns date, day of week, week number, and metric
     given a date chunk
@@ -74,9 +77,14 @@ def expand_datechunks(date_chunk):
     date = pd.to_datetime(date_chunk[0][2:])
     day_of_week = date.strftime('%a')
     week = int(date.strftime("%U"))
-    metric = day_time_total(date_chunk)
 
-    return date, day_of_week, week, metric
+    time_metric_list = date_chunk[1:]
+    description_metric = []
+    for description, metric in zip(time_metric_list[0::2], time_metric_list[1::2]):
+        description_metric.append((text_after_bullet(description),
+                                   hhmm_to_mm(text_after_bullet(metric))))
+    
+    return date, day_of_week, week, description_metric
 
 def create_DataFrame(filelist, dir):
     """Given a list of markdown files their directory
@@ -96,16 +104,23 @@ def create_DataFrame(filelist, dir):
             datechunk_list = chunk_by_date(log)
 
             for datechunk in datechunk_list:
-                date, day_of_week, week, metric = expand_datechunks(datechunk)
+                date, day_of_week, week, description_metric = expand_datechunks(datechunk)
 
-                tuple_list.append((habitname,
-                                   date,
-                                   day_of_week,
-                                   week,
-                                   metric))
+                for d_m in description_metric:
+
+                    description = d_m[0]
+                    metric = d_m[1]
+
+                    tuple_list.append((habitname,
+                                       date,
+                                       day_of_week,
+                                       week,
+                                       description,
+                                       metric))
 
     df = pd.DataFrame(tuple_list)
-    df.columns = ['Name', 'Date', 'Day', 'Week', 'Metric']
+    df.columns = ['Name', 'Date', 'Day', 'Week', 'Description', 'Metric']
+
     
     return df
 
@@ -121,10 +136,13 @@ def split_DataFrame(df):
 
     return dfList
 
+def metric_date_sum(df):
+    return df.groupby(['Name', 'Date', 'Day', 'Week'])['Metric'].sum().reset_index()
+
 def create_heatmap(df, color_low, color_high, font):
     """ Returns tile plot created from the given dataframe
     """
-    plt = (ggplot(df, aes(x = 'Week', y = 'Day', fill = 'Metric'))
+    plt = (ggplot(metric_date_sum(df), aes(x = 'Week', y = 'Day', fill = 'Metric'))
         + geom_tile(aes(width = 0.95, height = 0.95))
         + scale_fill_gradient(low = color_low, high = color_high)
         + ggtitle(df['Name'][0])
@@ -133,11 +151,12 @@ def create_heatmap(df, color_low, color_high, font):
 
     return plt
 
-def create_bar_metric(df):
+def create_bar_metric_mean(df):
     """ Returns bar plot with mean value of metric
     by day of week
     """
-    mean_by_day = df.groupby(['Day'])['Metric'].mean()
+    sum_by_day = metric_date_sum(df)
+    mean_by_day = sum_by_day.groupby(['Day'])['Metric'].mean()
     df2 = pd.DataFrame({'Day' : mean_by_day.index,
                         'Mean' : mean_by_day.values})
 
@@ -222,7 +241,7 @@ def main():
         ggsave(filename=save_dir+file, plot=plt, device = 'png', dpi=300)
         plotlist.append((save_dir+file, habit_name))
 
-        plt = create_bar_metric(df)
+        plt = create_bar_metric_mean(df)
         habit_name = df['Name'][0]
         file = habit_name + '_bar' + '.png'
         ggsave(filename=save_dir+file, plot=plt, device = 'png', dpi=300)
