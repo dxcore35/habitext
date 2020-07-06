@@ -160,7 +160,7 @@ def create_heatmap(df, color_low, color_high, font, save_dir):
 
     return ((file, habit_name))
 
-def create_bar_metric_mean(df, font, save_dir):
+def create_bar_metric_mean(df, color, font, save_dir):
     """ Create bar plot with mean value of metric by day of week
     and return tuple with file path and habit name
     """
@@ -175,7 +175,7 @@ def create_bar_metric_mean(df, font, save_dir):
                                         ordered = True)
 
     plt = (ggplot(pd.DataFrame(df2), aes(x = 'Day of Week', y = 'Mean'))
-        + geom_col()
+        + geom_col(fill = color)
         + ggtitle('Mean time by Day of Week')
         + theme_bw()
         + theme(text=element_text(family=font)))
@@ -219,7 +219,7 @@ def create_plots(df, color, color_low, color_high, font, save_dir):
     plotlist = []
 
     plotlist.append(create_heatmap(df, color_low, color_high, font, save_dir))
-    plotlist.append(create_bar_metric_mean(df, font, save_dir))
+    plotlist.append(create_bar_metric_mean(df, color, font, save_dir))
     plotlist.append(create_bar_metric_sum(df, color, font, save_dir))
 
     return plotlist
