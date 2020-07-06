@@ -186,8 +186,13 @@ def create_bar_metric_mean(df, font, save_dir):
 def create_bar_metric_sum(df, font, save_dir):
 
     sums_series = df.groupby(['Description'])['Metric'].sum()
-    df_sums = pd.DataFrame({'Description': sums_series.index,
+    df_sums = pd.DataFrame({'Desc': sums_series.index,
                             'Sum': sums_series.values})
+
+    order = df_sums.sort_values(by = ['Sum'], ascending = False)['Desc']
+    df_sums['Description'] = pd.Categorical(df_sums['Desc'],
+                                            categories=order,
+                                            ordered=True)
 
     plt = (ggplot(pd.DataFrame(df_sums), aes(x = 'Description', y = 'Sum'))
         + geom_col()
