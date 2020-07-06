@@ -139,7 +139,7 @@ def split_DataFrame(df):
 def metric_date_sum(df):
     return df.groupby(['Name', 'Date', 'Day', 'Week'])['Metric'].sum().reset_index()
 
-def create_heatmap(df, color_low, color_high, font):
+def create_heatmap(df, color_low, color_high, font, save_dir):
     """ Returns tile plot created from the given dataframe
     """
     plt = (ggplot(metric_date_sum(df), aes(x = 'Week', y = 'Day', fill = 'Metric'))
@@ -149,9 +149,14 @@ def create_heatmap(df, color_low, color_high, font):
         + theme_bw()
         + theme(text=element_text(family=font)))
 
-    return plt
+    habit_name = df['Name'][0]
+    f = habit_name + '_heatmap' + '.png'
+    file = save_dir+f
+    ggsave(filename=file, plot=plt, device = 'png', dpi=300)
 
-def create_bar_metric_mean(df):
+    return ((file, habit_name))
+
+def create_bar_metric_mean(df, font, save_dir):
     """ Returns bar plot with mean value of metric
     by day of week
     """
@@ -168,9 +173,44 @@ def create_bar_metric_mean(df):
     plt = (ggplot(pd.DataFrame(df2), aes(x = 'Day of Week', y = 'Mean'))
         + geom_col()
         + ggtitle('Mean time by Day of Week')
-        + theme_bw())
+        + theme_bw()
+        + theme(text=element_text(family=font)))
 
-    return plt
+    habit_name = df['Name'][0]
+    f = habit_name + '_meanbar' + '.png'
+    file = save_dir+f
+    ggsave(filename=file, plot=plt, device = 'png', dpi=300)
+
+    return ((file, habit_name))
+
+def create_bar_metric_sum(df, font, save_dir):
+
+    sums_series = df.groupby(['Description'])['Metric'].sum()
+    df_sums = pd.DataFrame({'Description': sums_series.index,
+                            'Sum': sums_series.values})
+
+    plt = (ggplot(pd.DataFrame(df_sums), aes(x = 'Description', y = 'Sum'))
+        + geom_col()
+        + ggtitle('Sum time per Description')
+        + theme_bw()
+        + theme(text=element_text(family=font)))
+
+    habit_name = df['Name'][0]
+    f = habit_name + '_sumbar' + '.png'
+    file = save_dir+f
+    ggsave(filename=file, plot=plt, device = 'png', dpi=300)
+
+    return ((file, habit_name))
+
+def create_plots(df, color_low, color_high, font, save_dir):
+
+    plotlist = []
+
+    plotlist.append(create_heatmap(df, color_low, color_high, font, save_dir))
+    plotlist.append(create_bar_metric_mean(df, font, save_dir))
+    plotlist.append(create_bar_metric_sum(df, font, save_dir))
+
+    return plotlist
 
 def get_date():
     """ Return date in yyyymmdd format
@@ -182,36 +222,53 @@ def delete_files(file_list):
     """
     for file in file_list:
         try:
-            os.remove(file[0])
+            os.remove(file)
         except OSError as e:
             print("Error: %s - %s." % (e.filename, e.strerror))
 
-def create_pdf(plotlist, dir):
+def create_pdf(plotslist, dir):
     """ Create pdf with images in plotlist
     """
     pdfmetrics.registerFont(UnicodeCIDFont('HeiseiMin-W3'))
     c = canvas.Canvas(dir + get_date() + '_habits.pdf')
 
-    for plot1, plot2 in zip(plotlist[0::2], plotlist[1::2]):
-        img = utils.ImageReader(plot1[0])
+    for plot_group in plotslist:
+        file_list = [x[0] for x in plot_group]
+        habit_name = plot_group[0][1]
+
+        c.setFont('HeiseiMin-W3', 16)
+        c.drawString(260, 800, habit_name)
+
+
+        img = utils.ImageReader(file_list[0])
         img_width, img_height = img.getSize()
         aspect = img_height / float (img_width)
-        x_pos = 1
-        y_pos1 = 400
-        y_pos2 = 50
-        scale = 500
-        c.setFont('HeiseiMin-W3', 16)
-        c.drawString(250, 800, plot1[1])
-        c.drawImage(plot1[0],
-                    x_pos,
-                    y_pos1,
+
+        x_left = 20
+        x_right = 290
+        y_top = 575
+        y_middle = 275
+
+        scale = 275
+
+        c.drawImage(file_list[0],
+                    x_left,
+                    y_top,
                     width = scale,
                     height = scale * aspect)
-        c.drawImage(plot2[0],
-                    x_pos,
-                    y_pos2,
+
+        c.drawImage(file_list[1],
+                    x_right,
+                    y_top,
                     width = scale,
                     height = scale * aspect)
+
+        c.drawImage(file_list[2],
+                    x_left,
+                    y_middle,
+                    width = scale,
+                    height = scale * aspect)
+
         c.showPage()
     
     c.save()
@@ -232,23 +289,18 @@ def main():
     df = create_DataFrame(habitlist, habit_dir)
     dfList = split_DataFrame(df)
 
-    plotlist = []
+    plotslist = []
 
     for df in dfList:
-        plt = create_heatmap(df, color_low, color_high, font)
-        habit_name = df['Name'][0]
-        file = habit_name + '_heatmap' + '.png'
-        ggsave(filename=save_dir+file, plot=plt, device = 'png', dpi=300)
-        plotlist.append((save_dir+file, habit_name))
+        plotslist.append(create_plots(df, color_low, color_high, font, save_dir))
 
-        plt = create_bar_metric_mean(df)
-        habit_name = df['Name'][0]
-        file = habit_name + '_bar' + '.png'
-        ggsave(filename=save_dir+file, plot=plt, device = 'png', dpi=300)
-        plotlist.append((save_dir+file, habit_name))
+    create_pdf(plotslist, save_dir)
 
-    create_pdf(plotlist, save_dir)
-    delete_files(plotlist)
+    delete_list = []
+    for l in plotslist:
+        for t in l:
+            delete_list.append(t[0])
+    delete_files(delete_list)
    
 
 if __name__ == '__main__':
