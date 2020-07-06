@@ -195,13 +195,14 @@ def create_bar_metric_sum(df, color, font, save_dir):
     df_sums = pd.DataFrame({'Desc': sums_series.index,
                             'Sum': sums_series.values})
 
-    order = df_sums.sort_values(by = ['Sum'], ascending = False)['Desc']
+    order = df_sums.sort_values(by = ['Sum'])['Desc']
     df_sums['Description'] = pd.Categorical(df_sums['Desc'],
                                             categories=order,
                                             ordered=True)
 
     plt = (ggplot(pd.DataFrame(df_sums), aes(x = 'Description', y = 'Sum'))
         + geom_col(fill = color)
+        + coord_flip()
         + ggtitle('Sum time per Description')
         + theme_bw()
         + theme(text=element_text(family=font)))
