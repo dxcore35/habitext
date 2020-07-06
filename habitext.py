@@ -68,6 +68,8 @@ def chunk_by_date(log):
     return date_chunks_list
 
 def text_after_bullet(s):
+    """ Return string after '- ' in given string
+    """
     return s.partition('- ')[2]
 
 def expand_datechunks(date_chunk):
@@ -137,10 +139,12 @@ def split_DataFrame(df):
     return dfList
 
 def metric_date_sum(df):
+    """ Return dataframe with sum of metric by day
+    """
     return df.groupby(['Name', 'Date', 'Day', 'Week'])['Metric'].sum().reset_index()
 
 def create_heatmap(df, color_low, color_high, font, save_dir):
-    """ Returns tile plot created from the given dataframe
+    """ Create tile plot and return tuple with file path and habit name
     """
     plt = (ggplot(metric_date_sum(df), aes(x = 'Week', y = 'Day', fill = 'Metric'))
         + geom_tile(aes(width = 0.95, height = 0.95))
@@ -157,8 +161,8 @@ def create_heatmap(df, color_low, color_high, font, save_dir):
     return ((file, habit_name))
 
 def create_bar_metric_mean(df, font, save_dir):
-    """ Returns bar plot with mean value of metric
-    by day of week
+    """ Create bar plot with mean value of metric by day of week
+    and return tuple with file path and habit name
     """
     sum_by_day = metric_date_sum(df)
     mean_by_day = sum_by_day.groupby(['Day'])['Metric'].mean()
@@ -184,7 +188,9 @@ def create_bar_metric_mean(df, font, save_dir):
     return ((file, habit_name))
 
 def create_bar_metric_sum(df, font, save_dir):
-
+    """ Create bar plot with total time spent for each description
+    and return tuple with file path and habit name
+    """
     sums_series = df.groupby(['Description'])['Metric'].sum()
     df_sums = pd.DataFrame({'Desc': sums_series.index,
                             'Sum': sums_series.values})
@@ -208,7 +214,8 @@ def create_bar_metric_sum(df, font, save_dir):
     return ((file, habit_name))
 
 def create_plots(df, color_low, color_high, font, save_dir):
-
+    """ Create each plot and return list with file paths
+    """
     plotlist = []
 
     plotlist.append(create_heatmap(df, color_low, color_high, font, save_dir))
