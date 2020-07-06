@@ -187,7 +187,7 @@ def create_bar_metric_mean(df, font, save_dir):
 
     return ((file, habit_name))
 
-def create_bar_metric_sum(df, font, save_dir):
+def create_bar_metric_sum(df, color, font, save_dir):
     """ Create bar plot with total time spent for each description
     and return tuple with file path and habit name
     """
@@ -201,7 +201,7 @@ def create_bar_metric_sum(df, font, save_dir):
                                             ordered=True)
 
     plt = (ggplot(pd.DataFrame(df_sums), aes(x = 'Description', y = 'Sum'))
-        + geom_col()
+        + geom_col(fill = color)
         + ggtitle('Sum time per Description')
         + theme_bw()
         + theme(text=element_text(family=font)))
@@ -213,14 +213,14 @@ def create_bar_metric_sum(df, font, save_dir):
 
     return ((file, habit_name))
 
-def create_plots(df, color_low, color_high, font, save_dir):
+def create_plots(df, color, color_low, color_high, font, save_dir):
     """ Create each plot and return list with file paths
     """
     plotlist = []
 
     plotlist.append(create_heatmap(df, color_low, color_high, font, save_dir))
     plotlist.append(create_bar_metric_mean(df, font, save_dir))
-    plotlist.append(create_bar_metric_sum(df, font, save_dir))
+    plotlist.append(create_bar_metric_sum(df, color, font, save_dir))
 
     return plotlist
 
@@ -294,6 +294,7 @@ def main():
     save_dir = "/habits/reports/"
     color_low = "lightgray"
     color_high = "green"
+    color = "green"
     font = "Noto Sans CJK JP"
 
     habitlist = md_file_list(habit_dir)
@@ -304,7 +305,12 @@ def main():
     plotslist = []
 
     for df in dfList:
-        plotslist.append(create_plots(df, color_low, color_high, font, save_dir))
+        plotslist.append(create_plots(df,
+                                      color,
+                                      color_low,
+                                      color_high,
+                                      font,
+                                      save_dir))
 
     create_pdf(plotslist, save_dir)
 
