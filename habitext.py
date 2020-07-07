@@ -79,6 +79,7 @@ def expand_datechunks(date_chunk):
     date = pd.to_datetime(date_chunk[0][2:])
     day_of_week = date.strftime('%a')
     week = int(date.strftime("%U"))
+    year = date.year
 
     time_metric_list = date_chunk[1:]
     description_metric = []
@@ -86,7 +87,7 @@ def expand_datechunks(date_chunk):
         description_metric.append((text_after_bullet(description),
                                    hhmm_to_mm(text_after_bullet(metric))))
     
-    return date, day_of_week, week, description_metric
+    return date, day_of_week, week, year, description_metric
 
 def create_DataFrame(filelist, dir):
     """Given a list of markdown files their directory
@@ -106,7 +107,7 @@ def create_DataFrame(filelist, dir):
             datechunk_list = chunk_by_date(log)
 
             for datechunk in datechunk_list:
-                date, day_of_week, week, description_metric = expand_datechunks(datechunk)
+                date, day_of_week, week, year, description_metric = expand_datechunks(datechunk)
 
                 for d_m in description_metric:
 
@@ -117,11 +118,12 @@ def create_DataFrame(filelist, dir):
                                        date,
                                        day_of_week,
                                        week,
+                                       year,
                                        description,
                                        metric))
 
     df = pd.DataFrame(tuple_list)
-    df.columns = ['Name', 'Date', 'Day', 'Week', 'Description', 'Metric']
+    df.columns = ['Name', 'Date', 'Day', 'Week', 'Year', 'Description', 'Metric']
 
     
     return df
