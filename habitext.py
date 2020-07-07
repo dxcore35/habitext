@@ -73,9 +73,13 @@ def text_after_bullet(s):
     return s.partition('- ')[2]
 
 def get_day_of_week(date):
+    """ Return day of week given a date
+    """
     return date.strftime('%a')
 
 def get_week_number(date):
+    """ Return week number given a date
+    """
     return int(date.strftime("%U"))
 
 def expand_datechunks(date_chunk):
@@ -307,7 +311,9 @@ def create_pdf(plotslist, dir):
     c.save()
 
 def add_dates_before(df, date):
-
+    """ Add empty observations to the dataframe from the Sunday
+    of the week before the first date up to the first date
+    """
     tuple_list = []
 
     start_date = date
