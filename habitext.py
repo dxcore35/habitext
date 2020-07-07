@@ -156,6 +156,7 @@ def create_heatmap(df, color_low, color_high, color_heatmap_border, font, save_d
     """
     plt = (ggplot(metric_date_sum(df), aes(x = 'Week', y = 'Day', fill = 'Metric'))
         + geom_tile(aes(width = 0.95, height = 0.95), color = color_heatmap_border, size = 1)
+        + scale_x_continuous(breaks = df['Week'].unique())
         + coord_equal()
         + scale_fill_gradient(low = color_low, high = color_high)
         + ggtitle(df['Name'][0])
