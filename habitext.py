@@ -99,11 +99,47 @@ def expand_datechunks(date_chunk):
     
     return date, day_of_week, week, year, description_metric
 
-def create_DataFrame(filelist, dir):
-    """Given a list of markdown files their directory
-    returns a DataFrame with all of the data
+def get_tuple_list(metadata, log):
+    """ Return tuple given metadata and log strings
     """
     tuple_list = []
+    
+    habitname = get_habit_name(metadata)
+    datechunk_list = chunk_by_date(log)
+
+    for datechunk in datechunk_list:
+        date, day_of_week, week, year, description_metric = expand_datechunks(datechunk)
+
+        for d_m in description_metric:
+
+            description = d_m[0]
+            metric = d_m[1]
+
+            tuple_list.append((habitname,
+                                date,
+                                day_of_week,
+                                week,
+                                year,
+                                description,
+                                metric))
+    
+    return tuple_list
+
+def tuple_list_to_df(tuple_list):
+    """ Return dataframe given list of tuples
+    """
+    df = pd.DataFrame(
+        tuple_list, columns = ['Name', 'Date', 'Day', 'Week',
+                               'Year', 'Description', 'Metric']
+    )
+    
+    return df
+
+def create_DataFrame(filelist, dir):
+    """ Given a list of markdown files their directory
+    returns a list of dataframes for each file
+    """
+    df_list = []
 
     for file in filelist:
         with open(dir+file, encoding='UTF-8') as f:
@@ -112,43 +148,13 @@ def create_DataFrame(filelist, dir):
             i = lines.index("# Log")
             metadata = lines[:i]
             log = [x for x in lines[i+1:] if x]
+            
+            if log:
+                tuple_list = get_tuple_list(metadata, log)
+                df = tuple_list_to_df(tuple_list)
+                df_list.append(df)
 
-            habitname = get_habit_name(metadata)
-            datechunk_list = chunk_by_date(log)
-
-            for datechunk in datechunk_list:
-                date, day_of_week, week, year, description_metric = expand_datechunks(datechunk)
-
-                for d_m in description_metric:
-
-                    description = d_m[0]
-                    metric = d_m[1]
-
-                    tuple_list.append((habitname,
-                                       date,
-                                       day_of_week,
-                                       week,
-                                       year,
-                                       description,
-                                       metric))
-
-    df = pd.DataFrame(tuple_list)
-    df.columns = ['Name', 'Date', 'Day', 'Week', 'Year', 'Description', 'Metric']
-
-    
-    return df
-
-def split_DataFrame(df):
-    """ Splits dataframe by habit name into list of dataframes
-    """
-    dfList = []
-
-    habits = df['Name'].unique()
-
-    for habit in habits:
-        dfList.append(df[df['Name'] == habit].reset_index())
-
-    return dfList
+    return df_list
 
 def metric_date_sum(df):
     """ Return dataframe with sum of metric by day
@@ -369,12 +375,11 @@ def main():
 
     habitlist = md_file_list(habit_dir)
 
-    df = create_DataFrame(habitlist, habit_dir)
-    dfList = split_DataFrame(df)
+    df_list = create_DataFrame(habitlist, habit_dir)
 
     plotslist = []
 
-    for df in dfList:
+    for df in df_list:
         df2 = insert_missing_dates(df)
         plotslist.append(create_plots(df2,
                                       color,
