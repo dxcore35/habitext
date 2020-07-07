@@ -174,7 +174,7 @@ def create_heatmap(df, color_low, color_high, color_heatmap_border, font, save_d
     file = save_dir+f
     ggsave(filename=file, plot=plt, device = 'png', height = 2, width = 2, dpi=300)
 
-    return ((file, habit_name))
+    return file
 
 def filter_zero_metric(df):
     """ Return dataframe without observations with a metric value of 0
@@ -206,7 +206,7 @@ def create_bar_metric_mean(df, color, font, save_dir):
     file = save_dir+f
     ggsave(filename=file, plot=plt, device = 'png', dpi=300)
 
-    return ((file, habit_name))
+    return file
 
 def create_bar_metric_sum(df, color, font, save_dir):
     """ Create bar plot with total time spent for each description
@@ -233,13 +233,15 @@ def create_bar_metric_sum(df, color, font, save_dir):
     file = save_dir+f
     ggsave(filename=file, plot=plt, device = 'png', dpi=300)
 
-    return ((file, habit_name))
+    return file
 
 def create_plots(df, color, color_low, color_high, color_heatmap_border,
                  font, save_dir):
     """ Create each plot and return list with file paths
     """
     plotlist = []
+
+    habit_name = df['Name'][0]
 
     plotlist.append(
         create_heatmap(df, color_low, color_high, 
@@ -248,7 +250,7 @@ def create_plots(df, color, color_low, color_high, color_heatmap_border,
     plotlist.append(create_bar_metric_mean(df, color, font, save_dir))
     plotlist.append(create_bar_metric_sum(df, color, font, save_dir))
 
-    return plotlist
+    return ((habit_name, plotlist))
 
 def get_date():
     """ Return date in yyyymmdd format
@@ -279,8 +281,8 @@ def create_pdf(plotslist, dir):
     c = canvas.Canvas(dir + get_date() + '_habits.pdf')
 
     for plot_group in plotslist:
-        file_list = [x[0] for x in plot_group]
-        habit_name = plot_group[0][1]
+        habit_name = plot_group[0]
+        file_list = plot_group[1]
 
         c.setFont('HeiseiMin-W3', 16)
         c.drawString(260, 800, habit_name)
@@ -385,11 +387,9 @@ def main():
 
     create_pdf(plotslist, save_dir)
 
-    delete_list = []
-    for l in plotslist:
-        for t in l:
-            delete_list.append(t[0])
-    delete_files(delete_list)
+    delete_lists = [x[1] for x in plotslist]
+    for delete_list in delete_lists:
+        delete_files(delete_list)
    
 
 if __name__ == '__main__':
