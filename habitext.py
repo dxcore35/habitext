@@ -151,11 +151,12 @@ def metric_date_sum(df):
     """
     return df.groupby(['Name', 'Date', 'Day', 'Week'])['Metric'].sum().reset_index()
 
-def create_heatmap(df, color_low, color_high, font, save_dir):
+def create_heatmap(df, color_low, color_high, color_heatmap_border, font, save_dir):
     """ Create tile plot and return tuple with file path and habit name
     """
     plt = (ggplot(metric_date_sum(df), aes(x = 'Week', y = 'Day', fill = 'Metric'))
-        + geom_tile(aes(width = 0.95, height = 0.95))
+        + geom_tile(aes(width = 0.95, height = 0.95), color = color_heatmap_border, size = 1)
+        + coord_equal()
         + scale_fill_gradient(low = color_low, high = color_high)
         + ggtitle(df['Name'][0])
         + theme_bw()
@@ -164,7 +165,7 @@ def create_heatmap(df, color_low, color_high, font, save_dir):
     habit_name = df['Name'][0]
     f = habit_name + '_heatmap' + '.png'
     file = save_dir+f
-    ggsave(filename=file, plot=plt, device = 'png', dpi=300)
+    ggsave(filename=file, plot=plt, device = 'png', height = 2, width = 2, dpi=300)
 
     return ((file, habit_name))
 
@@ -222,12 +223,14 @@ def create_bar_metric_sum(df, color, font, save_dir):
 
     return ((file, habit_name))
 
-def create_plots(df, color, color_low, color_high, font, save_dir):
+def create_plots(df, color, color_low, color_high, color_heatmap_border,
+                 font, save_dir):
     """ Create each plot and return list with file paths
     """
     plotlist = []
 
-    plotlist.append(create_heatmap(df, color_low, color_high, font, save_dir))
+    plotlist.append(create_heatmap(df, color_low, color_high,
+                                   color_heatmap_border, font, save_dir))
     plotlist.append(create_bar_metric_mean(df, color, font, save_dir))
     plotlist.append(create_bar_metric_sum(df, color, font, save_dir))
 
@@ -263,32 +266,40 @@ def create_pdf(plotslist, dir):
 
         img = utils.ImageReader(file_list[0])
         img_width, img_height = img.getSize()
-        aspect = img_height / float (img_width)
+        aspect0 = img_width / float (img_height)
+
+        img = utils.ImageReader(file_list[1])
+        img_width, img_height = img.getSize()
+        aspect1 = img_width / float (img_height)
+
+        img = utils.ImageReader(file_list[2])
+        img_width, img_height = img.getSize()
+        aspect2 = img_width / float (img_height)
 
         x_left = 20
         x_right = 290
-        y_top = 575
-        y_middle = 275
+        y_top = 525
+        y_middle = 225
 
-        scale = 275
+        scale = 200
 
         c.drawImage(file_list[0],
                     x_left,
                     y_top,
-                    width = scale,
-                    height = scale * aspect)
+                    width = scale * aspect0,
+                    height = scale)
 
         c.drawImage(file_list[1],
                     x_right,
                     y_top,
-                    width = scale,
-                    height = scale * aspect)
+                    width = scale * aspect1,
+                    height = scale)
 
         c.drawImage(file_list[2],
                     x_left,
                     y_middle,
-                    width = scale,
-                    height = scale * aspect)
+                    width = scale * aspect2,
+                    height = scale)
 
         c.showPage()
     
@@ -343,7 +354,8 @@ def main():
     # Directories need to exist
     habit_dir = "/habits/"
     save_dir = "/habits/reports/"
-    color_low = "lightgray"
+    color_heatmap_border = "black"
+    color_low = "white"
     color_high = "green"
     color = "green"
     font = "Noto Sans CJK JP"
@@ -361,6 +373,7 @@ def main():
                                       color,
                                       color_low,
                                       color_high,
+                                      color_heatmap_border,
                                       font,
                                       save_dir))
 
