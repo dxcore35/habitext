@@ -254,6 +254,14 @@ def delete_files(file_list):
             os.remove(file)
         except OSError as e:
             print("Error: %s - %s." % (e.filename, e.strerror))
+            
+def get_aspect(image):
+    """ Return aspect given an image
+    """
+    img = utils.ImageReader(image)
+    img_width, img_height = img.getSize()
+    return img_width / float (img_height)
+    
 
 def create_pdf(plotslist, dir):
     """ Create pdf with images in plotlist
@@ -268,18 +276,9 @@ def create_pdf(plotslist, dir):
         c.setFont('HeiseiMin-W3', 16)
         c.drawString(260, 800, habit_name)
 
-
-        img = utils.ImageReader(file_list[0])
-        img_width, img_height = img.getSize()
-        aspect0 = img_width / float (img_height)
-
-        img = utils.ImageReader(file_list[1])
-        img_width, img_height = img.getSize()
-        aspect1 = img_width / float (img_height)
-
-        img = utils.ImageReader(file_list[2])
-        img_width, img_height = img.getSize()
-        aspect2 = img_width / float (img_height)
+        aspect0 = get_aspect(file_list[0])
+        aspect1 = get_aspect(file_list[1])
+        aspect2 = get_aspect(file_list[2])
 
         x_left = 20
         x_right = 290
