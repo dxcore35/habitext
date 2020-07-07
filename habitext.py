@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 from plotnine import *
-from datetime import datetime
+from datetime import datetime, timedelta
 from reportlab.pdfgen import canvas
 from reportlab.lib import utils
 from reportlab.platypus import Image
@@ -72,13 +72,19 @@ def text_after_bullet(s):
     """
     return s.partition('- ')[2]
 
+def get_day_of_week(date):
+    return date.strftime('%a')
+
+def get_week_number(date):
+    return int(date.strftime("%U"))
+
 def expand_datechunks(date_chunk):
     """ Returns date, day of week, week number, and metric
     given a date chunk
     """
     date = pd.to_datetime(date_chunk[0][2:])
-    day_of_week = date.strftime('%a')
-    week = int(date.strftime("%U"))
+    day_of_week = get_day_of_week(date)
+    week = get_week_number(date)
     year = date.year
 
     time_metric_list = date_chunk[1:]
@@ -287,7 +293,49 @@ def create_pdf(plotslist, dir):
         c.showPage()
     
     c.save()
-    
+
+def add_dates_before(df, date):
+
+    tuple_list = []
+
+    start_date = date
+    end_date = df['Date'][0]
+
+    habitname = df['Name'][0]
+    description = ''
+    metric = 0
+
+    daterange = pd.date_range(start_date, end_date - timedelta(days=1))
+
+    for date in daterange:
+        day_of_week = get_day_of_week(date)
+        week = get_week_number(date)
+        year = date.year
+
+        tuple_list.append((habitname,
+                            date,
+                            day_of_week,
+                            week,
+                            year,
+                            description,
+                            metric))
+
+    df2 = pd.DataFrame(tuple_list)
+    df2.columns = ['Name', 'Date', 'Day', 'Week', 'Year', 'Description', 'Metric']
+
+    df3 = pd.concat([df2, df], ignore_index=True)
+
+    return df3
+
+def insert_missing_dates(df):
+    """ Adds 2 weeks of data with metric 0 to dataframe
+    """
+    first_date = df['Date'][0]
+    start_sunday = first_date - timedelta(days=(first_date.weekday() - 6) % 7, weeks=1)
+    df = add_dates_before(df, start_sunday)
+
+    return df
+
 def main():
     """Create DataFrame from markdown files, split dataframes
     by habit name, create plots, and add plots to PDF
@@ -308,7 +356,8 @@ def main():
     plotslist = []
 
     for df in dfList:
-        plotslist.append(create_plots(df,
+        df2 = insert_missing_dates(df)
+        plotslist.append(create_plots(df2,
                                       color,
                                       color_low,
                                       color_high,
