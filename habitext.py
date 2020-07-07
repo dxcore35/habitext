@@ -115,13 +115,8 @@ def get_tuple_list(metadata, log):
             description = d_m[0]
             metric = d_m[1]
 
-            tuple_list.append((habitname,
-                                date,
-                                day_of_week,
-                                week,
-                                year,
-                                description,
-                                metric))
+            tuple_list.append((habitname, date, day_of_week,
+                               week, year, description, metric))
     
     return tuple_list
 
@@ -241,8 +236,10 @@ def create_plots(df, color, color_low, color_high, color_heatmap_border,
     """
     plotlist = []
 
-    plotlist.append(create_heatmap(df, color_low, color_high,
-                                   color_heatmap_border, font, save_dir))
+    plotlist.append(
+        create_heatmap(df, color_low, color_high, 
+                       color_heatmap_border, font, save_dir)
+    )
     plotlist.append(create_bar_metric_mean(df, color, font, save_dir))
     plotlist.append(create_bar_metric_sum(df, color, font, save_dir))
 
@@ -336,13 +333,8 @@ def add_dates_before(df, date):
         week = get_week_number(date)
         year = date.year
 
-        tuple_list.append((habitname,
-                            date,
-                            day_of_week,
-                            week,
-                            year,
-                            description,
-                            metric))
+        tuple_list.append((habitname, date, day_of_week, week,
+                           year, description, metric))
 
     df2 = pd.DataFrame(tuple_list)
     df2.columns = ['Name', 'Date', 'Day', 'Week', 'Year', 'Description', 'Metric']
@@ -381,13 +373,10 @@ def main():
 
     for df in df_list:
         df2 = insert_missing_dates(df)
-        plotslist.append(create_plots(df2,
-                                      color,
-                                      color_low,
-                                      color_high,
-                                      color_heatmap_border,
-                                      font,
-                                      save_dir))
+        plotslist.append(
+            create_plots(df2, color, color_low, color_high,
+                         color_heatmap_border, font, save_dir)
+        )
 
     create_pdf(plotslist, save_dir)
 
