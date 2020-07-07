@@ -176,11 +176,16 @@ def create_heatmap(df, color_low, color_high, color_heatmap_border, font, save_d
 
     return ((file, habit_name))
 
+def filter_zero_metric(df):
+    """ Return dataframe without observations with a metric value of 0
+    """
+    return df[df['Metric'] != 0]
+
 def create_bar_metric_mean(df, color, font, save_dir):
     """ Create bar plot with mean value of metric by day of week
     and return tuple with file path and habit name
     """
-    sum_by_day = metric_date_sum(df)
+    sum_by_day = metric_date_sum(filter_zero_metric(df))
     mean_by_day = sum_by_day.groupby(['Day'])['Metric'].mean()
     df2 = pd.DataFrame({'Day' : mean_by_day.index,
                         'Mean' : mean_by_day.values})
