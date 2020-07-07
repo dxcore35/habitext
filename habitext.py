@@ -159,13 +159,14 @@ def create_heatmap(df, color_low, color_high, color_heatmap_border, font, save_d
     """ Create tile plot and return tuple with file path and habit name
     """
     plt = (ggplot(metric_date_sum(df), aes(x = 'Week', y = 'Day', fill = 'Metric'))
-        + geom_tile(aes(width = 0.95, height = 0.95), color = color_heatmap_border, size = 1)
-        + scale_x_continuous(breaks = df['Week'].unique())
-        + coord_equal()
-        + scale_fill_gradient(low = color_low, high = color_high)
-        + ggtitle(df['Name'][0])
-        + theme_bw()
-        + theme(text=element_text(family=font)))
+           + geom_tile(aes(width = 0.95, height = 0.95),
+                       color = color_heatmap_border, size = 1)
+           + scale_x_continuous(breaks = df['Week'].unique())
+           + coord_equal()
+           + scale_fill_gradient(low = color_low, high = color_high)
+           + ggtitle(df['Name'][0])
+           + theme_bw()
+           + theme(text=element_text(family=font)))
 
     habit_name = df['Name'][0]
     f = habit_name + '_heatmap' + '.png'
@@ -189,10 +190,10 @@ def create_bar_metric_mean(df, color, font, save_dir):
                                         ordered = True)
 
     plt = (ggplot(pd.DataFrame(df2), aes(x = 'Day of Week', y = 'Mean'))
-        + geom_col(fill = color)
-        + ggtitle('Mean time by Day of Week')
-        + theme_bw()
-        + theme(text=element_text(family=font)))
+           + geom_col(fill = color)
+           + ggtitle('Mean time by Day of Week')
+           + theme_bw()
+           + theme(text=element_text(family=font)))
 
     habit_name = df['Name'][0]
     f = habit_name + '_meanbar' + '.png'
@@ -215,11 +216,11 @@ def create_bar_metric_sum(df, color, font, save_dir):
                                             ordered=True)
 
     plt = (ggplot(pd.DataFrame(df_sums), aes(x = 'Description', y = 'Sum'))
-        + geom_col(fill = color)
-        + coord_flip()
-        + ggtitle('Sum time per Description')
-        + theme_bw()
-        + theme(text=element_text(family=font)))
+           + geom_col(fill = color)
+           + coord_flip()
+           + ggtitle('Sum time per Description')
+           + theme_bw()
+           + theme(text=element_text(family=font)))
 
     habit_name = df['Name'][0]
     f = habit_name + '_sumbar' + '.png'
