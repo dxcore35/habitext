@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 from plotnine import *
 from datetime import datetime, timedelta
 from reportlab.pdfgen import canvas
@@ -18,7 +19,7 @@ def md_file_list(dir):
 
     return mdlist
 
-def get_habit_name(metadata):
+def name_from_metadata(metadata):
     """ Returns habit name given metadata string
     """
     return (
@@ -82,6 +83,11 @@ def get_week_number(date):
     """
     return int(date.strftime("%U"))
 
+def get_year(date):
+    """ Return year given a date
+    """
+    return int(date.strftime("%Y"))
+
 def expand_datechunks(date_chunk):
     """ Returns date, day of week, week number, and metric
     given a date chunk
@@ -89,7 +95,7 @@ def expand_datechunks(date_chunk):
     date = pd.to_datetime(date_chunk[0][2:])
     day_of_week = get_day_of_week(date)
     week = get_week_number(date)
-    year = date.year
+    year = get_year(date)
 
     time_metric_list = date_chunk[1:]
     description_metric = []
@@ -104,7 +110,7 @@ def get_tuple_list(metadata, log):
     """
     tuple_list = []
     
-    habitname = get_habit_name(metadata)
+    habitname = name_from_metadata(metadata)
     datechunk_list = chunk_by_date(log)
 
     for datechunk in datechunk_list:
@@ -159,11 +165,7 @@ def metric_date_sum(df):
 def create_heatmap(df, color_low, color_high, color_heatmap_border, font, save_dir):
     """ Create tile plot and return tuple with file path and habit name
     """
-    df2 = metric_date_sum(df)
-    order = ['Sat', 'Fri', 'Thu', 'Wed', 'Tue', 'Mon', 'Sun']
-    df2['Day'] = pd.Categorical(df2['Day'], categories = order)
-    
-    plt = (ggplot(df2, aes(x = 'Week', y = 'Day', fill = 'Metric'))
+    plt = (ggplot(df, aes(x = 'Week', y = 'Day', fill = 'Metric'))
            + geom_tile(aes(width = 0.95, height = 0.95),
                        color = color_heatmap_border, size = 1)
            + scale_x_continuous(breaks = df['Week'].unique())
@@ -239,6 +241,15 @@ def create_bar_metric_sum(df, color, font, save_dir):
 
     return file
 
+def get_complete_date_sums(df):
+    df_date_sums = metric_date_sum(df)
+    df_complete_date_sums = insert_missing_dates(df_date_sums)
+    order = ['Sat', 'Fri', 'Thu', 'Wed', 'Tue', 'Mon', 'Sun']
+    df_complete_date_sums['Day'] = pd.Categorical(df_complete_date_sums['Day'],
+                                                  categories = order)
+    
+    return df_complete_date_sums
+
 def create_plots(df, color, color_low, color_high, color_heatmap_border,
                  font, save_dir):
     """ Create each plot and return list with file paths
@@ -247,8 +258,10 @@ def create_plots(df, color, color_low, color_high, color_heatmap_border,
 
     habit_name = df['Name'][0]
 
+    df_complete_date_sums = get_complete_date_sums(df)
+
     plotlist.append(
-        create_heatmap(df, color_low, color_high, 
+        create_heatmap(df_complete_date_sums, color_low, color_high, 
                        color_heatmap_border, font, save_dir)
     )
     plotlist.append(create_bar_metric_mean(df, color, font, save_dir))
@@ -329,6 +342,11 @@ def get_first_date(df):
     """
     return df['Date'][0]
 
+def get_last_date(df):
+    """ Return last date in dataframe
+    """
+    return df['Date'].iloc[-1]
+
 def add_zeros_before(df, date):
     """ Add empty observations to the dataframe from the Sunday
     of the week before the first date up to the first date
@@ -347,7 +365,7 @@ def add_zeros_before(df, date):
     for date in daterange:
         day_of_week = get_day_of_week(date)
         week = get_week_number(date)
-        year = date.year
+        year = get_year(date)
 
         tuple_list.append((habitname, date, day_of_week, week,
                            year, description, metric))
@@ -359,12 +377,39 @@ def add_zeros_before(df, date):
 
     return df3
 
+def get_habit_name(df):
+    """ Return the name of the habit for the given dataframe
+    """
+    return df['Name'][0]
+
+def add_zeros_between(df):
+    """ Add dates with metric as 0 for any missing dates in the dataframe
+    """
+    date_range = pd.date_range(get_first_date(df), get_last_date(df))
+    
+    df.set_index('Date', inplace=True)
+    df.index = pd.to_datetime(df.index)
+    df['existing_date'] = 1
+    df = df.reindex(date_range, fill_value = 0)
+    df.reset_index(inplace=True)
+    df.rename(columns={'index':'Date'}, inplace=True)
+    df.loc[df['existing_date'] == 0, 'Name'] = get_habit_name(df)
+    
+    df['Day'] = np.where(df['existing_date'] == 0, df['Date'].apply(get_day_of_week), df['Day'])
+    df['Week'] = np.where(df['existing_date'] == 0, df['Date'].apply(get_week_number), df['Week'])
+    df['Year'] = np.where(df['existing_date'] == 0, df['Date'].apply(get_year), df['Year'])
+    df['Description'] = np.where(df['existing_date'] == 0, '', df['Description'])
+    df.drop('existing_date', axis = 1, inplace = True)
+    
+    return df
+
 def insert_missing_dates(df):
     """ Adds 2 weeks of data with metric 0 to dataframe
     """
     first_date = get_first_date(df)
     start_sunday = first_date - timedelta(days=(first_date.weekday() - 6) % 7, weeks=1)
     df = add_zeros_before(df, start_sunday)
+    df = add_zeros_between(df)
 
     return df
 
@@ -388,9 +433,8 @@ def main():
     plotslist = []
 
     for df in df_list:
-        df2 = insert_missing_dates(df)
         plotslist.append(
-            create_plots(df2, color, color_low, color_high,
+            create_plots(df, color, color_low, color_high,
                          color_heatmap_border, font, save_dir)
         )
 
