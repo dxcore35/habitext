@@ -162,6 +162,11 @@ def metric_date_sum(df):
     """
     return df.groupby(['Name', 'Date', 'Day', 'Week'])['Metric'].sum().reset_index()
 
+def filter_zero_metric(df):
+    """ Return dataframe without observations with a metric value of 0
+    """
+    return df[df['Metric'] != 0]
+
 def create_heatmap(df, color_low, color_high, color_heatmap_border, font, save_dir):
     """ Create tile plot and return tuple with file path and habit name
     """
@@ -181,11 +186,6 @@ def create_heatmap(df, color_low, color_high, color_heatmap_border, font, save_d
     ggsave(filename=file, plot=plt, device = 'png', height = 2, width = 2, dpi=300)
 
     return file
-
-def filter_zero_metric(df):
-    """ Return dataframe without observations with a metric value of 0
-    """
-    return df[df['Metric'] != 0]
 
 def create_bar_metric_mean(df, color, font, save_dir):
     """ Create bar plot with mean value of metric by day of week
@@ -241,102 +241,6 @@ def create_bar_metric_sum(df, color, font, save_dir):
 
     return file
 
-def get_complete_date_sums(df):
-    df_date_sums = metric_date_sum(df)
-    df_complete_date_sums = insert_missing_dates(df_date_sums)
-    order = ['Sat', 'Fri', 'Thu', 'Wed', 'Tue', 'Mon', 'Sun']
-    df_complete_date_sums['Day'] = pd.Categorical(df_complete_date_sums['Day'],
-                                                  categories = order)
-    
-    return df_complete_date_sums
-
-def create_plots(df, color, color_low, color_high, color_heatmap_border,
-                 font, save_dir):
-    """ Create each plot and return list with file paths
-    """
-    plotlist = []
-
-    habit_name = df['Name'][0]
-
-    df_complete_date_sums = get_complete_date_sums(df)
-
-    plotlist.append(
-        create_heatmap(df_complete_date_sums, color_low, color_high, 
-                       color_heatmap_border, font, save_dir)
-    )
-    plotlist.append(create_bar_metric_mean(df, color, font, save_dir))
-    plotlist.append(create_bar_metric_sum(df, color, font, save_dir))
-
-    return ((habit_name, plotlist))
-
-def get_date():
-    """ Return date in yyyymmdd format
-    """
-    return datetime.today().strftime('%Y%m%d')
-
-def delete_files(file_list):
-    """ Deletes files in file_list
-    """
-    for file in file_list:
-        try:
-            os.remove(file)
-        except OSError as e:
-            print("Error: %s - %s." % (e.filename, e.strerror))
-            
-def get_aspect(image):
-    """ Return aspect given an image
-    """
-    img = utils.ImageReader(image)
-    img_width, img_height = img.getSize()
-    return img_width / float (img_height)
-    
-
-def create_pdf(plotslist, dir):
-    """ Create pdf with images in plotlist
-    """
-    pdfmetrics.registerFont(UnicodeCIDFont('HeiseiMin-W3'))
-    c = canvas.Canvas(dir + get_date() + '_habits.pdf')
-
-    for plot_group in plotslist:
-        habit_name = plot_group[0]
-        file_list = plot_group[1]
-
-        c.setFont('HeiseiMin-W3', 16)
-        c.drawString(260, 800, habit_name)
-
-        aspect0 = get_aspect(file_list[0])
-        aspect1 = get_aspect(file_list[1])
-        aspect2 = get_aspect(file_list[2])
-
-        x_left = 20
-        x_right = 290
-        y_top = 525
-        y_middle = 225
-
-        scale = 200
-
-        c.drawImage(file_list[0],
-                    x_left,
-                    y_top,
-                    width = scale * aspect0,
-                    height = scale)
-
-        c.drawImage(file_list[1],
-                    x_right,
-                    y_top,
-                    width = scale * aspect1,
-                    height = scale)
-
-        c.drawImage(file_list[2],
-                    x_left,
-                    y_middle,
-                    width = scale * aspect2,
-                    height = scale)
-
-        c.showPage()
-    
-    c.save()
-    
 def get_first_date(df):
     """ Return first date in dataframe
     """
@@ -412,6 +316,102 @@ def insert_missing_dates(df):
     df = add_zeros_between(df)
 
     return df
+
+def get_complete_date_sums(df):
+    df_date_sums = metric_date_sum(df)
+    df_complete_date_sums = insert_missing_dates(df_date_sums)
+    order = ['Sat', 'Fri', 'Thu', 'Wed', 'Tue', 'Mon', 'Sun']
+    df_complete_date_sums['Day'] = pd.Categorical(df_complete_date_sums['Day'],
+                                                  categories = order)
+    
+    return df_complete_date_sums
+
+def create_plots(df, color, color_low, color_high, color_heatmap_border,
+                 font, save_dir):
+    """ Create each plot and return list with file paths
+    """
+    plotlist = []
+
+    habit_name = df['Name'][0]
+
+    df_complete_date_sums = get_complete_date_sums(df)
+
+    plotlist.append(
+        create_heatmap(df_complete_date_sums, color_low, color_high, 
+                       color_heatmap_border, font, save_dir)
+    )
+    plotlist.append(create_bar_metric_mean(df, color, font, save_dir))
+    plotlist.append(create_bar_metric_sum(df, color, font, save_dir))
+
+    return ((habit_name, plotlist))
+
+def get_date():
+    """ Return date in yyyymmdd format
+    """
+    return datetime.today().strftime('%Y%m%d')
+
+def get_aspect(image):
+    """ Return aspect given an image
+    """
+    img = utils.ImageReader(image)
+    img_width, img_height = img.getSize()
+    return img_width / float (img_height)
+    
+
+def create_pdf(plotslist, dir):
+    """ Create pdf with images in plotlist
+    """
+    pdfmetrics.registerFont(UnicodeCIDFont('HeiseiMin-W3'))
+    c = canvas.Canvas(dir + get_date() + '_habits.pdf')
+
+    for plot_group in plotslist:
+        habit_name = plot_group[0]
+        file_list = plot_group[1]
+
+        c.setFont('HeiseiMin-W3', 16)
+        c.drawString(260, 800, habit_name)
+
+        aspect0 = get_aspect(file_list[0])
+        aspect1 = get_aspect(file_list[1])
+        aspect2 = get_aspect(file_list[2])
+
+        x_left = 20
+        x_right = 290
+        y_top = 525
+        y_middle = 225
+
+        scale = 200
+
+        c.drawImage(file_list[0],
+                    x_left,
+                    y_top,
+                    width = scale * aspect0,
+                    height = scale)
+
+        c.drawImage(file_list[1],
+                    x_right,
+                    y_top,
+                    width = scale * aspect1,
+                    height = scale)
+
+        c.drawImage(file_list[2],
+                    x_left,
+                    y_middle,
+                    width = scale * aspect2,
+                    height = scale)
+
+        c.showPage()
+    
+    c.save()
+    
+def delete_files(file_list):
+    """ Deletes files in file_list
+    """
+    for file in file_list:
+        try:
+            os.remove(file)
+        except OSError as e:
+            print("Error: %s - %s." % (e.filename, e.strerror))
 
 def main():
     """Create DataFrame from markdown files, split dataframes
