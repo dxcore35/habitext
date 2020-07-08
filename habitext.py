@@ -159,7 +159,11 @@ def metric_date_sum(df):
 def create_heatmap(df, color_low, color_high, color_heatmap_border, font, save_dir):
     """ Create tile plot and return tuple with file path and habit name
     """
-    plt = (ggplot(metric_date_sum(df), aes(x = 'Week', y = 'Day', fill = 'Metric'))
+    df2 = metric_date_sum(df)
+    order = ['Sat', 'Fri', 'Thu', 'Wed', 'Tue', 'Mon', 'Sun']
+    df2['Day'] = pd.Categorical(df2['Day'], categories = order)
+    
+    plt = (ggplot(df2, aes(x = 'Week', y = 'Day', fill = 'Metric'))
            + geom_tile(aes(width = 0.95, height = 0.95),
                        color = color_heatmap_border, size = 1)
            + scale_x_continuous(breaks = df['Week'].unique())
