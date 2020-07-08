@@ -180,7 +180,7 @@ def create_heatmap(df, color_low, color_high, color_heatmap_border, font, save_d
            + theme_bw()
            + theme(text=element_text(family=font)))
 
-    habit_name = df['Name'][0]
+    habit_name = get_habit_name(df)
     f = habit_name + '_heatmap' + '.png'
     file = save_dir+f
     ggsave(filename=file, plot=plt, device = 'png', height = 2, width = 2, dpi=300)
@@ -207,7 +207,7 @@ def create_bar_metric_mean(df, color, font, save_dir):
            + theme_bw()
            + theme(text=element_text(family=font)))
 
-    habit_name = df['Name'][0]
+    habit_name = get_habit_name(df)
     f = habit_name + '_meanbar' + '.png'
     file = save_dir+f
     ggsave(filename=file, plot=plt, device = 'png', dpi=300)
@@ -234,7 +234,7 @@ def create_bar_metric_sum(df, color, font, save_dir):
            + theme_bw()
            + theme(text=element_text(family=font)))
 
-    habit_name = df['Name'][0]
+    habit_name = get_habit_name(df)
     f = habit_name + '_sumbar' + '.png'
     file = save_dir+f
     ggsave(filename=file, plot=plt, device = 'png', dpi=300)
@@ -260,7 +260,7 @@ def add_zeros_before(df, date):
     start_date = date
     end_date = df['Date'][0]
 
-    habitname = df['Name'][0]
+    habitname = get_habit_name(df)
     description = ''
     metric = 0
 
@@ -332,7 +332,7 @@ def create_plots(df, color, color_low, color_high, color_heatmap_border,
     """
     plotlist = []
 
-    habit_name = df['Name'][0]
+    habit_name = get_habit_name(df)
 
     df_complete_date_sums = get_complete_date_sums(df)
 
