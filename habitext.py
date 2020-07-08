@@ -324,7 +324,7 @@ def create_pdf(plotslist, dir):
     
     c.save()
 
-def add_dates_before(df, date):
+def add_zeros_before(df, date):
     """ Add empty observations to the dataframe from the Sunday
     of the week before the first date up to the first date
     """
@@ -359,7 +359,7 @@ def insert_missing_dates(df):
     """
     first_date = df['Date'][0]
     start_sunday = first_date - timedelta(days=(first_date.weekday() - 6) % 7, weeks=1)
-    df = add_dates_before(df, start_sunday)
+    df = add_zeros_before(df, start_sunday)
 
     return df
 
