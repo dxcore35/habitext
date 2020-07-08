@@ -171,7 +171,7 @@ def create_heatmap(df, color_low, color_high, color_heatmap_border, font, save_d
            + scale_x_continuous(breaks = df['Week'].unique())
            + coord_equal()
            + scale_fill_gradient(low = color_low, high = color_high)
-           + ggtitle(df['Name'][0])
+           + ggtitle('Heatmap')
            + theme_bw()
            + theme(text=element_text(family=font)))
 
