@@ -512,10 +512,8 @@ def main():
     plotslist = []
 
     for df in df_list:
-        plotslist.append(
-            create_plots(df, color, color_low, color_high,
-                         color_heatmap_border, font, save_dir)
-        )
+        plotslist.append(create_plots(df, color, color_low, color_high,
+                         color_heatmap_border, font, save_dir))
 
     create_pdf(plotslist, save_dir)
 
