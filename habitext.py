@@ -125,12 +125,15 @@ def expand_datechunks(date_chunk):
     """ Returns date, day of week, week number, and metric
     given a date chunk
     """
-    date = pd.to_datetime(date_chunk[0][2:])
+    date = datechunk_to_date(date_chunk)
     day_of_week = get_day_of_week(date)
     week = get_week_number(date)
     year = get_year(date)
     
-    return date, day_of_week, week, year
+    return day_of_week, week, year
+
+def datechunk_to_date(date_chunk):
+    return pd.to_datetime(date_chunk[0][2:])
 
 def get_tuple_list(log):
     """ Return tuple given log strings
@@ -140,7 +143,8 @@ def get_tuple_list(log):
     datechunk_list = chunk_by_date(log)
 
     for date_chunk in datechunk_list:
-        date, day_of_week, week, year = expand_datechunks(date_chunk)
+        date = datechunk_to_date(date_chunk)
+        day_of_week, week, year = expand_datechunks(date_chunk)
         description_metric = get_description_metric(date_chunk)
 
         for d_m in description_metric:
