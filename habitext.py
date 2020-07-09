@@ -354,17 +354,24 @@ def get_habit_name(df):
     """
     return df['Name'][0]
 
-def add_zeros_between(df):
-    """ Add dates with metric as 0 for any missing dates in the dataframe
+def fill_dates(df, date_range):
+    """ Fill dates in the date_range
     """
-    date_range = pd.date_range(get_first_date(df), get_last_date(df))
-    
     df.set_index('Date', inplace=True)
     df.index = pd.to_datetime(df.index)
     df['existing_date'] = 1
     df = df.reindex(date_range, fill_value = 0)
     df.reset_index(inplace=True)
     df.rename(columns={'index':'Date'}, inplace=True)
+    
+    return df
+
+def add_zeros_between(df):
+    """ Add dates with metric as 0 for any missing dates in the dataframe
+    """
+    date_range = pd.date_range(get_first_date(df), get_last_date(df))
+    
+    df = fill_dates(df, date_range)
     df.loc[df['existing_date'] == 0, 'Name'] = get_habit_name(df)
     
     df['Day'] = np.where(df['existing_date'] == 0, df['Date'].apply(get_day_of_week), df['Day'])
