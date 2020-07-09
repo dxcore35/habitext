@@ -264,7 +264,7 @@ def create_completion_num_graph(df, color, font, save_dir):
                                                  freq='W-SUN'))
            + ggtitle('Completed Days per Week')
            + theme_bw()
-           + theme(text=element_text(family=font)))
+           + theme(text=element_text(family=font, size = 13)))
     
     habit_name = get_habit_name(df)
     f = habit_name + '_completion' + '.png'
