@@ -2,6 +2,8 @@
 
 Habitext is a habit tracking tool that generates PDF reports from habit data in markdown files.
 
+[Example PDF](https://raw.githubusercontent.com/ryushida/habitext/master/example_habits/reports/20200708_habits.pdf)
+
 # Habit Format
 
 Habits are in the following format in a directory.
