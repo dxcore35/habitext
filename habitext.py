@@ -150,7 +150,17 @@ def tuple_list_to_df(tuple_list):
     
     return df
 
-def create_DataFrame(filelist, dir):
+def df_from_log(log, metadata):
+    """ Return dataframe for habit given its log and metadata
+    """
+    tuple_list = get_tuple_list(log)
+    df = tuple_list_to_df(tuple_list)
+    df['Name'] = name_from_metadata(metadata)
+    df['Goal'] = goal_from_metadata(metadata)
+    
+    return df
+
+def get_df_list(filelist, dir):
     """ Given a list of markdown files their directory
     returns a list of dataframes for each file
     """
@@ -164,12 +174,8 @@ def create_DataFrame(filelist, dir):
             metadata = lines[:i]
             log = [x for x in lines[i+1:] if x]
             
-            if log:                
-                tuple_list = get_tuple_list(log)
-                df = tuple_list_to_df(tuple_list)
-                df['Name'] = name_from_metadata(metadata)
-                df['Goal'] = goal_from_metadata(metadata)
-                df_list.append(df)
+            if log:
+                df_list.append(df_from_log(log, metadata))     
 
     return df_list
 
@@ -510,7 +516,7 @@ def main():
 
     habitlist = md_file_list(habit_dir)
 
-    df_list = create_DataFrame(habitlist, habit_dir)
+    df_list = get_df_list(habitlist, habit_dir)
 
     plotslist = []
 
