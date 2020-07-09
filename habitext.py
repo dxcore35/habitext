@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 from plotnine import *
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from reportlab.pdfgen import canvas
 from reportlab.lib import utils
 from reportlab.platypus import Image
@@ -313,11 +313,6 @@ def get_first_date(df):
     """
     return df['Date'][0]
 
-def get_last_date(df):
-    """ Return last date in dataframe
-    """
-    return df['Date'].iloc[-1]
-
 def add_zeros_before(df, date):
     """ Add empty observations to the dataframe from the Sunday
     of the week before the first date up to the first date
@@ -366,10 +361,13 @@ def fill_dates(df, date_range):
     
     return df
 
+def get_yesterday():
+    return datetime.now() - timedelta(days=1)
+
 def add_zeros_between(df):
     """ Add dates with metric as 0 for any missing dates in the dataframe
     """
-    date_range = pd.date_range(get_first_date(df), get_last_date(df))
+    date_range = pd.date_range(get_first_date(df), get_yesterday())
     
     df = fill_dates(df, date_range)
     df.loc[df['existing_date'] == 0, 'Name'] = get_habit_name(df)
