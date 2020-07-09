@@ -404,18 +404,21 @@ def fill_nonexisting_year(df):
 def fill_nonexisting_description(df):
     return np.where(df['existing_date'] == 0, '', df['Description'])
 
-def add_zeros_between(df):
-    """ Add dates with metric as 0 for any missing dates in the dataframe
-    """
-    date_range = pd.date_range(get_first_date(df), get_yesterday())
-    
-    df = fill_dates(df, date_range)
+def fill_nonexisting_columns(df):
     df = fill_nonexisting_name(df)
-    
     df['Day'] = fill_nonexisting_day(df)
     df['Week'] = fill_nonexisting_week(df)
     df['Year'] = fill_nonexisting_year(df)
     df['Description'] = fill_nonexisting_description(df)
+    
+    return df
+
+def add_zeros_between(df):
+    """ Add dates with metric as 0 for any missing dates in the dataframe
+    """
+    date_range = pd.date_range(get_first_date(df), get_yesterday())
+    df = fill_dates(df, date_range)
+    df = fill_nonexisting_columns(df)
     df.drop('existing_date', axis = 1, inplace = True)
     
     return df
