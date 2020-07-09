@@ -160,6 +160,20 @@ def df_from_log(log, metadata):
     
     return df
 
+def metadata_from_lines(lines):
+    """ Return metadata string given lines of a markdown file
+    """
+    i = lines.index("# Log")
+    metadata = lines[:i]
+    return metadata
+
+def log_from_lines(lines):
+    """ Return log string given lines of a markdown files
+    """
+    i = lines.index("# Log")
+    log = [x for x in lines[i+1:] if x]
+    return log
+
 def get_df_list(filelist, dir):
     """ Given a list of markdown files their directory
     returns a list of dataframes for each file
@@ -170,9 +184,8 @@ def get_df_list(filelist, dir):
         with open(dir+file, encoding='UTF-8') as f:
             lines = [line.rstrip('\n') for line in f]
             
-            i = lines.index("# Log")
-            metadata = lines[:i]
-            log = [x for x in lines[i+1:] if x]
+            metadata = metadata_from_lines(lines)
+            log = log_from_lines(lines)
             
             if log:
                 df_list.append(df_from_log(log, metadata))     
