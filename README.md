@@ -6,7 +6,15 @@ Habitext is a habit tracking tool that generates PDF reports from habit data in 
 
 Habits are in the following format in a directory.
 
-#### **`habit1.md`**
+```
+habit folder
+∟ 01_habit1.md
+∟ 02_habit2.md
+```
+
+The file name can by anything, but the order of the habits in the PDF is determined by the order of the files in the folder.
+
+#### **`01_habit1.md`**
 ```md
 # Metadata
 
