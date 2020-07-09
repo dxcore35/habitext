@@ -178,7 +178,7 @@ def create_heatmap(df, color_low, color_high, color_heatmap_border, font, save_d
            + scale_fill_gradient(low = color_low, high = color_high)
            + ggtitle('Heatmap')
            + theme_bw()
-           + theme(text=element_text(family=font, size = 13)))
+           + theme(figure_size = (6, 6), text=element_text(family=font, size = 13)))
 
     habit_name = get_habit_name(df)
     f = habit_name + '_heatmap' + '.png'
@@ -205,7 +205,7 @@ def create_bar_metric_mean(df, color, font, save_dir):
            + geom_col(fill = color)
            + ggtitle('Mean time by Day of Week')
            + theme_bw()
-           + theme(text=element_text(family=font, size = 13)))
+           + theme(figure_size = (6, 6), text=element_text(family=font, size = 13)))
 
     habit_name = get_habit_name(df)
     f = habit_name + '_meanbar' + '.png'
@@ -234,7 +234,7 @@ def create_bar_metric_sum(df, color, font, save_dir):
            + coord_flip()
            + ggtitle('Sum time per Description')
            + theme_bw()
-           + theme(text=element_text(family=font, size = 13)))
+           + theme(figure_size = (6, 6), text=element_text(family=font, size = 13)))
 
     habit_name = get_habit_name(df)
     f = habit_name + '_sumbar' + '.png'
@@ -264,7 +264,7 @@ def create_completion_num_graph(df, color, font, save_dir):
                                                  freq='W-SUN'))
            + ggtitle('Completed Days per Week')
            + theme_bw()
-           + theme(text=element_text(family=font, size = 13)))
+           + theme(figure_size = (6, 6), text=element_text(family=font, size = 13)))
     
     habit_name = get_habit_name(df)
     f = habit_name + '_completion' + '.png'
@@ -376,12 +376,12 @@ def create_plots(df, color, color_low, color_high, color_heatmap_border,
         create_heatmap(df_complete_date_sums, color_low, color_high, 
                        color_heatmap_border, font, save_dir)
     )
-    plotlist.append(create_bar_metric_mean(df, color, font, save_dir))
-    plotlist.append(create_bar_metric_sum(df, color, font, save_dir))
     plotlist.append(
         create_completion_num_graph(df_complete_date_sums, color,
                                      font, save_dir)
     )
+    plotlist.append(create_bar_metric_mean(df, color, font, save_dir))
+    plotlist.append(create_bar_metric_sum(df, color, font, save_dir))
 
     return ((habit_name, plotlist))
 
@@ -416,33 +416,35 @@ def create_pdf(plotslist, dir):
         aspect2 = get_aspect(file_list[2])
         aspect3 = get_aspect(file_list[3])
 
-        x_left = 20
-        x_right = 320
+        x_left_top = 30
+        x_right_top = 345
+        x_left_middle = 30
+        x_right_middle = 315
         y_top = 525
         y_middle = 225
 
         scale = 200
 
         c.drawImage(file_list[0],
-                    x_left,
+                    x_left_top,
                     y_top,
                     width = scale * aspect0,
                     height = scale)
 
         c.drawImage(file_list[1],
-                    x_right,
+                    x_right_top,
                     y_top,
                     width = scale * aspect1,
                     height = scale)
 
         c.drawImage(file_list[2],
-                    x_left,
+                    x_left_middle,
                     y_middle,
                     width = scale * aspect2,
                     height = scale)
-        
+
         c.drawImage(file_list[3],
-                    x_right,
+                    x_right_middle,
                     y_middle,
                     width = scale * aspect3,
                     height = scale)
