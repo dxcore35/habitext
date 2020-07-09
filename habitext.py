@@ -46,11 +46,44 @@ def date_line_number(log):
 
     return line_nums
 
+def get_habit_name(df):
+    """ Return the name of the habit for the given dataframe
+    """
+    return df['Name'][0]
+
 def hhmm_to_mm(time_str):
     """ Given a hh:mm string returns minutes as integer
     """
     h, m = time_str.split(':')
     return int(h) * 60 + int(m)
+
+def text_after_bullet(s):
+    """ Return string after '- ' in given string
+    """
+    return s.partition('- ')[2]
+
+def get_day_of_week(date):
+    """ Return day of week given a date
+    """
+    return date.strftime('%a')
+
+def get_week_number(date):
+    """ Return week number given a date
+    """
+    return int(date.strftime("%U"))
+
+def get_year(date):
+    """ Return year given a date
+    """
+    return int(date.strftime("%Y"))
+
+def get_first_date(df):
+    """ Return first date in dataframe
+    """
+    return df['Date'][0]
+
+def get_yesterday():
+    return datetime.now() - timedelta(days=1)
 
 def day_time_total(date_chunk):
     """ Returns total time in minutes given a date chunk string
@@ -75,26 +108,6 @@ def chunk_by_date(log):
         date_chunks_list.append(log[first:second])
 
     return date_chunks_list
-
-def text_after_bullet(s):
-    """ Return string after '- ' in given string
-    """
-    return s.partition('- ')[2]
-
-def get_day_of_week(date):
-    """ Return day of week given a date
-    """
-    return date.strftime('%a')
-
-def get_week_number(date):
-    """ Return week number given a date
-    """
-    return int(date.strftime("%U"))
-
-def get_year(date):
-    """ Return year given a date
-    """
-    return int(date.strftime("%Y"))
 
 def get_description_metric(date_chunk):
     """ Return a list of tuples with the description and metric
@@ -332,11 +345,6 @@ def create_completion_num_graph(df, color, font, save_dir):
     
     return file
 
-def get_first_date(df):
-    """ Return first date in dataframe
-    """
-    return df['Date'][0]
-
 def add_zeros_before(df, date):
     """ Add empty observations to the dataframe from the Sunday
     of the week before the first date up to the first date
@@ -368,11 +376,6 @@ def add_zeros_before(df, date):
 
     return df3
 
-def get_habit_name(df):
-    """ Return the name of the habit for the given dataframe
-    """
-    return df['Name'][0]
-
 def fill_dates(df, date_range):
     """ Fill dates in the date_range
     """
@@ -384,9 +387,6 @@ def fill_dates(df, date_range):
     df.rename(columns={'index':'Date'}, inplace=True)
     
     return df
-
-def get_yesterday():
-    return datetime.now() - timedelta(days=1)
 
 def add_zeros_between(df):
     """ Add dates with metric as 0 for any missing dates in the dataframe
