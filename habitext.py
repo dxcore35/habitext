@@ -397,6 +397,9 @@ def fill_nonexisting_week(df):
 def fill_nonexisting_year(df):
     return np.where(df['existing_date'] == 0, df['Date'].apply(get_year), df['Year'])
 
+def fill_nonexisting_description(df):
+    return np.where(df['existing_date'] == 0, '', df['Description'])
+
 def add_zeros_between(df):
     """ Add dates with metric as 0 for any missing dates in the dataframe
     """
@@ -408,7 +411,7 @@ def add_zeros_between(df):
     df['Day'] = fill_nonexisting_day(df)
     df['Week'] = fill_nonexisting_week(df)
     df['Year'] = fill_nonexisting_year(df)
-    df['Description'] = np.where(df['existing_date'] == 0, '', df['Description'])
+    df['Description'] = fill_nonexisting_description(df)
     df.drop('existing_date', axis = 1, inplace = True)
     
     return df
