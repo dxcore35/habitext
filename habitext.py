@@ -429,44 +429,21 @@ def create_pdf(plotslist, dir):
 
         c.setFont('HeiseiMin-W3', 16)
         c.drawString(50, 800, habit_name + ':   ' + goal)
-
-        aspect0 = get_aspect(file_list[0])
-        aspect1 = get_aspect(file_list[1])
-        aspect2 = get_aspect(file_list[2])
-        aspect3 = get_aspect(file_list[3])
-
-        x_left_top = 30
-        x_right_top = 345
-        x_left_middle = 30
-        x_right_middle = 315
+        
+        aspect = [get_aspect(file_list[0]),
+                  get_aspect(file_list[1]),
+                  get_aspect(file_list[2]),
+                  get_aspect(file_list[3])]
+        
         y_top = 525
         y_middle = 225
+        pos = [(30, y_top), (345, y_top), (30, y_middle), (345, y_middle)]
 
         scale = 200
-
-        c.drawImage(file_list[0],
-                    x_left_top,
-                    y_top,
-                    width = scale * aspect0,
-                    height = scale)
-
-        c.drawImage(file_list[1],
-                    x_right_top,
-                    y_top,
-                    width = scale * aspect1,
-                    height = scale)
-
-        c.drawImage(file_list[2],
-                    x_left_middle,
-                    y_middle,
-                    width = scale * aspect2,
-                    height = scale)
-
-        c.drawImage(file_list[3],
-                    x_right_middle,
-                    y_middle,
-                    width = scale * aspect3,
-                    height = scale)
+        
+        for idx, file in enumerate(file_list):
+            c.drawImage(file, pos[idx][0], pos[idx][1],
+                        width=scale * aspect[idx], height=scale)
 
         c.showPage()
     
