@@ -414,7 +414,13 @@ def get_aspect(image):
     img = utils.ImageReader(image)
     img_width, img_height = img.getSize()
     return img_width / float (img_height)
-    
+
+def add_text(plot_group, c):
+    habit_name = plot_group[0]
+    goal = plot_group[1]
+    c.setFont('HeiseiMin-W3', 16)
+    c.drawString(50, 800, habit_name + ':   ' + goal)
+    return c
 
 def create_pdf(plotslist, dir):
     """ Create pdf with images in plotlist
@@ -423,12 +429,8 @@ def create_pdf(plotslist, dir):
     c = canvas.Canvas(dir + get_date() + '_habits.pdf')
 
     for plot_group in plotslist:
-        habit_name = plot_group[0]
-        goal = plot_group[1]
+        c = add_text(plot_group, c)
         file_list = plot_group[2]
-
-        c.setFont('HeiseiMin-W3', 16)
-        c.drawString(50, 800, habit_name + ':   ' + goal)
         
         aspect = [get_aspect(file_list[0]),
                   get_aspect(file_list[1]),
