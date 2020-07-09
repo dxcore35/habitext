@@ -236,13 +236,19 @@ def create_bar_metric_mean(df, color, font, save_dir):
 
     return file
 
-def create_bar_metric_sum(df, color, font, save_dir):
-    """ Create bar plot with total time spent for each description
-    and return tuple with file path and habit name
+def metric_sum_df(df):
+    """ Return dataframe with sum of metric by day
     """
     sums_series = df.groupby(['Description'])['Metric'].sum()
     df_sums = pd.DataFrame({'Desc': sums_series.index,
                             'Sum': sums_series.values})
+    return df_sums
+
+def create_bar_metric_sum(df, color, font, save_dir):
+    """ Create bar plot with total time spent for each description
+    and return tuple with file path and habit name
+    """
+    df_sums = metric_sum_df(df)
     
     df_sums['Desc'] = df_sums['Desc'].str.wrap(8)
 
