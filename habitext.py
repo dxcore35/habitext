@@ -96,6 +96,18 @@ def get_year(date):
     """
     return int(date.strftime("%Y"))
 
+def get_description_metric(date_chunk):
+    """ Return a list of tuples with the description and metric
+    """
+    time_metric_list = date_chunk[1:]
+    description_metric = []
+    for description, metric in zip(time_metric_list[0::2],
+                                   time_metric_list[1::2]):
+        description_metric.append((text_after_bullet(description),
+                                   hhmm_to_mm(text_after_bullet(metric))))
+        
+    return description_metric
+
 def expand_datechunks(date_chunk):
     """ Returns date, day of week, week number, and metric
     given a date chunk
@@ -104,12 +116,7 @@ def expand_datechunks(date_chunk):
     day_of_week = get_day_of_week(date)
     week = get_week_number(date)
     year = get_year(date)
-
-    time_metric_list = date_chunk[1:]
-    description_metric = []
-    for description, metric in zip(time_metric_list[0::2], time_metric_list[1::2]):
-        description_metric.append((text_after_bullet(description),
-                                   hhmm_to_mm(text_after_bullet(metric))))
+    description_metric = get_description_metric(date_chunk)
     
     return date, day_of_week, week, year, description_metric
 
