@@ -205,7 +205,7 @@ def create_bar_metric_mean(df, color, font, save_dir):
            + geom_col(fill = color)
            + ggtitle('Mean time by Day of Week')
            + theme_bw()
-           + theme(text=element_text(family=font)))
+           + theme(text=element_text(family=font, size = 13)))
 
     habit_name = get_habit_name(df)
     f = habit_name + '_meanbar' + '.png'
