@@ -296,6 +296,7 @@ def create_completion_num_graph(df, color, font, save_dir):
     
     plt = (ggplot(df_week_sums, aes(x = 'Week', y = 'Sum'))
            + geom_line()
+           + coord_cartesian(ylim=[0,7])
            + scale_x_date(breaks = pd.date_range(min(df_week_sums['Week']),
                                                  max(df_week_sums['Week']),
                                                  freq='W-SUN'))
