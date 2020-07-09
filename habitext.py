@@ -415,6 +415,24 @@ def get_aspect(image):
     img_width, img_height = img.getSize()
     return img_width / float (img_height)
 
+def add_images(file_list, c):
+    """ Adds images in file_list to PDF page
+    """
+    aspect = [get_aspect(file_list[0]), get_aspect(file_list[1]),
+              get_aspect(file_list[2]), get_aspect(file_list[3])]
+    
+    y_top = 525
+    y_middle = 225
+    pos = [(30, y_top), (345, y_top), (30, y_middle), (345, y_middle)]
+
+    scale = 200
+    
+    for idx, file in enumerate(file_list):
+        c.drawImage(file, pos[idx][0], pos[idx][1],
+                    width=scale * aspect[idx], height=scale)
+        
+    return c
+
 def add_text(plot_group, c):
     """ Adds habit name and goal to PDF as text
     """
@@ -433,21 +451,7 @@ def create_pdf(plotslist, dir):
     for plot_group in plotslist:
         c = add_text(plot_group, c)
         file_list = plot_group[2]
-        
-        aspect = [get_aspect(file_list[0]),
-                  get_aspect(file_list[1]),
-                  get_aspect(file_list[2]),
-                  get_aspect(file_list[3])]
-        
-        y_top = 525
-        y_middle = 225
-        pos = [(30, y_top), (345, y_top), (30, y_middle), (345, y_middle)]
-
-        scale = 200
-        
-        for idx, file in enumerate(file_list):
-            c.drawImage(file, pos[idx][0], pos[idx][1],
-                        width=scale * aspect[idx], height=scale)
+        c = add_images(file_list, c)
 
         c.showPage()
     
