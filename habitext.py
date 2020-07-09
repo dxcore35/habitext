@@ -120,13 +120,11 @@ def expand_datechunks(date_chunk):
     
     return date, day_of_week, week, year, description_metric
 
-def get_tuple_list(metadata, log):
-    """ Return tuple given metadata and log strings
+def get_tuple_list(log):
+    """ Return tuple given log strings
     """
     tuple_list = []
     
-    goal = goal_from_metadata(metadata)
-    habitname = name_from_metadata(metadata)
     datechunk_list = chunk_by_date(log)
 
     for datechunk in datechunk_list:
@@ -137,8 +135,8 @@ def get_tuple_list(metadata, log):
             description = d_m[0]
             metric = d_m[1]
 
-            tuple_list.append((habitname, date, day_of_week,
-                               week, year, description, metric, goal))
+            tuple_list.append((date, day_of_week,
+                               week, year, description, metric))
     
     return tuple_list
 
@@ -146,8 +144,8 @@ def tuple_list_to_df(tuple_list):
     """ Return dataframe given list of tuples
     """
     df = pd.DataFrame(
-        tuple_list, columns = ['Name', 'Date', 'Day', 'Week',
-                               'Year', 'Description', 'Metric', 'Goal']
+        tuple_list, columns = ['Date', 'Day', 'Week',
+                               'Year', 'Description', 'Metric']
     )
     
     return df
@@ -166,9 +164,11 @@ def create_DataFrame(filelist, dir):
             metadata = lines[:i]
             log = [x for x in lines[i+1:] if x]
             
-            if log:
-                tuple_list = get_tuple_list(metadata, log)
+            if log:                
+                tuple_list = get_tuple_list(log)
                 df = tuple_list_to_df(tuple_list)
+                df['Name'] = name_from_metadata(metadata)
+                df['Goal'] = goal_from_metadata(metadata)
                 df_list.append(df)
 
     return df_list
