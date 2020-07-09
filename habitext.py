@@ -178,7 +178,7 @@ def create_heatmap(df, color_low, color_high, color_heatmap_border, font, save_d
            + scale_fill_gradient(low = color_low, high = color_high)
            + ggtitle('Heatmap')
            + theme_bw()
-           + theme(text=element_text(family=font)))
+           + theme(text=element_text(family=font, size = 13)))
 
     habit_name = get_habit_name(df)
     f = habit_name + '_heatmap' + '.png'
