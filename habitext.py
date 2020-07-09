@@ -221,6 +221,8 @@ def create_bar_metric_sum(df, color, font, save_dir):
     sums_series = df.groupby(['Description'])['Metric'].sum()
     df_sums = pd.DataFrame({'Desc': sums_series.index,
                             'Sum': sums_series.values})
+    
+    df_sums['Desc'] = df_sums['Desc'].str.wrap(10)
 
     order = df_sums.sort_values(by = ['Sum'])['Desc']
     df_sums['Description'] = pd.Categorical(df_sums['Desc'],
