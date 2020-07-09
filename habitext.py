@@ -222,7 +222,7 @@ def create_bar_metric_sum(df, color, font, save_dir):
     df_sums = pd.DataFrame({'Desc': sums_series.index,
                             'Sum': sums_series.values})
     
-    df_sums['Desc'] = df_sums['Desc'].str.wrap(10)
+    df_sums['Desc'] = df_sums['Desc'].str.wrap(8)
 
     order = df_sums.sort_values(by = ['Sum'])['Desc']
     df_sums['Description'] = pd.Categorical(df_sums['Desc'],
@@ -234,7 +234,7 @@ def create_bar_metric_sum(df, color, font, save_dir):
            + coord_flip()
            + ggtitle('Sum time per Description')
            + theme_bw()
-           + theme(text=element_text(family=font)))
+           + theme(text=element_text(family=font, size = 13)))
 
     habit_name = get_habit_name(df)
     f = habit_name + '_sumbar' + '.png'
