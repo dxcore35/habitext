@@ -388,6 +388,9 @@ def fill_dates(df, date_range):
     
     return df
 
+def fill_nonexisting_day(df):
+    return np.where(df['existing_date'] == 0, df['Date'].apply(get_day_of_week), df['Day'])
+
 def add_zeros_between(df):
     """ Add dates with metric as 0 for any missing dates in the dataframe
     """
@@ -396,7 +399,7 @@ def add_zeros_between(df):
     df = fill_dates(df, date_range)
     df.loc[df['existing_date'] == 0, 'Name'] = get_habit_name(df)
     
-    df['Day'] = np.where(df['existing_date'] == 0, df['Date'].apply(get_day_of_week), df['Day'])
+    df['Day'] = fill_nonexisting_day(df)
     df['Week'] = np.where(df['existing_date'] == 0, df['Date'].apply(get_week_number), df['Week'])
     df['Year'] = np.where(df['existing_date'] == 0, df['Date'].apply(get_year), df['Year'])
     df['Description'] = np.where(df['existing_date'] == 0, '', df['Description'])
