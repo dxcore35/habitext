@@ -416,6 +416,8 @@ def get_aspect(image):
     return img_width / float (img_height)
 
 def add_text(plot_group, c):
+    """ Adds habit name and goal to PDF as text
+    """
     habit_name = plot_group[0]
     goal = plot_group[1]
     c.setFont('HeiseiMin-W3', 16)
