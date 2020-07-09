@@ -388,6 +388,10 @@ def fill_dates(df, date_range):
     
     return df
 
+def fill_nonexisting_name(df):
+    df.loc[df['existing_date'] == 0, 'Name'] = get_habit_name(df)
+    return df
+
 def fill_nonexisting_day(df):
     return np.where(df['existing_date'] == 0, df['Date'].apply(get_day_of_week), df['Day'])
 
@@ -406,7 +410,7 @@ def add_zeros_between(df):
     date_range = pd.date_range(get_first_date(df), get_yesterday())
     
     df = fill_dates(df, date_range)
-    df.loc[df['existing_date'] == 0, 'Name'] = get_habit_name(df)
+    df = fill_nonexisting_name(df)
     
     df['Day'] = fill_nonexisting_day(df)
     df['Week'] = fill_nonexisting_week(df)
