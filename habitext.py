@@ -203,14 +203,20 @@ def create_heatmap(df, color_low, color_high, color_heatmap_border, font, save_d
 
     return file
 
-def create_bar_metric_mean(df, color, font, save_dir):
-    """ Create bar plot with mean value of metric by day of week
-    and return tuple with file path and habit name
+def day_mean_df(df):
+    """ Returns dataframe with the mean metric by day
     """
     sum_by_day = metric_date_sum(filter_zero_metric(df))
     mean_by_day = sum_by_day.groupby(['Day'])['Metric'].mean()
     df2 = pd.DataFrame({'Day' : mean_by_day.index,
                         'Mean' : mean_by_day.values})
+    return df2
+
+def create_bar_metric_mean(df, color, font, save_dir):
+    """ Create bar plot with mean value of metric by day of week
+    and return tuple with file path and habit name
+    """
+    df2 = day_mean_df(df)
 
     order = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
     df2['Day of Week'] = pd.Categorical(df2['Day'],
