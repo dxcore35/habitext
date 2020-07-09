@@ -271,9 +271,8 @@ def create_bar_metric_sum(df, color, font, save_dir):
 
     return file
 
-def create_completion_num_graph(df, color, font, save_dir):
-    """ Create bar plot with the number of days per week the
-    habit is completed and return tuple with file path and habit name
+def week_sum_df(df):
+    """ Return dataframe with sum of metric per week
     """
     df['Metric'] = df['Metric'].clip(upper = 1)
     
@@ -284,6 +283,14 @@ def create_completion_num_graph(df, color, font, save_dir):
                                    label='left')['Metric'].sum()
     df_week_sums = pd.DataFrame({'Week': week_sums_series.index,
                                  'Sum': week_sums_series.values})
+    
+    return df_week_sums
+
+def create_completion_num_graph(df, color, font, save_dir):
+    """ Create bar plot with the number of days per week the
+    habit is completed and return tuple with file path and habit name
+    """
+    df_week_sums = week_sum_df(df)
     
     plt = (ggplot(df_week_sums, aes(x = 'Week', y = 'Sum'))
            + geom_line()
