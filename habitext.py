@@ -241,6 +241,36 @@ def create_bar_metric_sum(df, color, font, save_dir):
 
     return file
 
+def create_completion_num_graph(df, color, font, save_dir):
+    """ Create bar plot with the number of days per week the
+    habit is completed and return tuple with file path and habit name
+    """
+    df['Metric'] = df['Metric'].clip(upper = 1)
+    
+    df.set_index('Date', inplace=True)
+    df.index = pd.to_datetime(df.index)
+    week_sums_series = df.resample('W-SUN',
+                                   closed = 'left',
+                                   label='left')['Metric'].sum()
+    df_week_sums = pd.DataFrame({'Week': week_sums_series.index,
+                                 'Sum': week_sums_series.values})
+    
+    plt = (ggplot(df_week_sums, aes(x = 'Week', y = 'Sum'))
+           + geom_line()
+           + scale_x_date(breaks = pd.date_range(min(df_week_sums['Week']),
+                                                 max(df_week_sums['Week']),
+                                                 freq='W-SUN'))
+           + ggtitle('Completed Days per Week')
+           + theme_bw()
+           + theme(text=element_text(family=font)))
+    
+    habit_name = get_habit_name(df)
+    f = habit_name + '_completion' + '.png'
+    file = save_dir+f
+    ggsave(filename=file, plot=plt, device = 'png', dpi=300)
+    
+    return file
+
 def get_first_date(df):
     """ Return first date in dataframe
     """
@@ -342,6 +372,10 @@ def create_plots(df, color, color_low, color_high, color_heatmap_border,
     )
     plotlist.append(create_bar_metric_mean(df, color, font, save_dir))
     plotlist.append(create_bar_metric_sum(df, color, font, save_dir))
+    plotlist.append(
+        create_completion_num_graph(df_complete_date_sums, color,
+                                     font, save_dir)
+    )
 
     return ((habit_name, plotlist))
 
@@ -374,9 +408,10 @@ def create_pdf(plotslist, dir):
         aspect0 = get_aspect(file_list[0])
         aspect1 = get_aspect(file_list[1])
         aspect2 = get_aspect(file_list[2])
+        aspect3 = get_aspect(file_list[3])
 
         x_left = 20
-        x_right = 290
+        x_right = 320
         y_top = 525
         y_middle = 225
 
@@ -398,6 +433,12 @@ def create_pdf(plotslist, dir):
                     x_left,
                     y_middle,
                     width = scale * aspect2,
+                    height = scale)
+        
+        c.drawImage(file_list[3],
+                    x_right,
+                    y_middle,
+                    width = scale * aspect3,
                     height = scale)
 
         c.showPage()
