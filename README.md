@@ -67,5 +67,5 @@ docker run -it -v C:\Directory\of\habits:/habits/ habitext
 
 You may need to set the timezone for the container. One way is by replacing the 'TZ database name' in the following command. Get your timezone from the 'TZ database name' column in the [list of tz database time zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 ```bash
-docker run -it -v C:\Files\Repos\habits:/habits/ -e "TZ='TZ database name'" habitext
+docker run --rm -it -v C:\Files\Repos\habits:/habits/ -e "TZ='TZ database name'" habitext
 ```
