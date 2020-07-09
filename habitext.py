@@ -393,13 +393,19 @@ def fill_nonexisting_name(df):
     return df
 
 def fill_nonexisting_day(df):
-    return np.where(df['existing_date'] == 0, df['Date'].apply(get_day_of_week), df['Day'])
+    return np.where(df['existing_date'] == 0,
+                    df['Date'].apply(get_day_of_week),
+                    df['Day'])
 
 def fill_nonexisting_week(df):
-    return np.where(df['existing_date'] == 0, df['Date'].apply(get_week_number), df['Week'])
+    return np.where(df['existing_date'] == 0,
+                    df['Date'].apply(get_week_number),
+                    df['Week'])
 
 def fill_nonexisting_year(df):
-    return np.where(df['existing_date'] == 0, df['Date'].apply(get_year), df['Year'])
+    return np.where(df['existing_date'] == 0,
+                    df['Date'].apply(get_year),
+                    df['Year'])
 
 def fill_nonexisting_description(df):
     return np.where(df['existing_date'] == 0, '', df['Description'])
