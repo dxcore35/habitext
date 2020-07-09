@@ -249,15 +249,17 @@ def create_bar_metric_sum(df, color, font, save_dir):
     and return tuple with file path and habit name
     """
     df_sums = metric_sum_df(df)
+    df_sums['Sum'] = df_sums['Sum'] / 60
+    df_sums.columns = ['Desc', 'Hours']
     
     df_sums['Desc'] = df_sums['Desc'].str.wrap(8)
 
-    order = df_sums.sort_values(by = ['Sum'])['Desc']
+    order = df_sums.sort_values(by = ['Hours'])['Desc']
     df_sums['Description'] = pd.Categorical(df_sums['Desc'],
                                             categories=order,
                                             ordered=True)
 
-    plt = (ggplot(pd.DataFrame(df_sums), aes(x = 'Description', y = 'Sum'))
+    plt = (ggplot(pd.DataFrame(df_sums), aes(x = 'Description', y = 'Hours'))
            + geom_col(fill = color)
            + coord_flip()
            + ggtitle('Sum time per Description')
