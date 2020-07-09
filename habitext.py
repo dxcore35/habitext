@@ -26,6 +26,14 @@ def name_from_metadata(metadata):
         [i for i in metadata if i.startswith('Name:')][0]
         .split("Name:", 1)[1].strip()
     )
+    
+def goal_from_metadata(metadata):
+    """ Returns habit name given metadata string
+    """
+    return (
+        [i for i in metadata if i.startswith('Goal:')][0]
+        .split("Goal:", 1)[1].strip()
+    )
 
 def date_line_number(log):
     """ Returns line numbers of dates in log string as a list
@@ -110,6 +118,7 @@ def get_tuple_list(metadata, log):
     """
     tuple_list = []
     
+    goal = goal_from_metadata(metadata)
     habitname = name_from_metadata(metadata)
     datechunk_list = chunk_by_date(log)
 
@@ -122,7 +131,7 @@ def get_tuple_list(metadata, log):
             metric = d_m[1]
 
             tuple_list.append((habitname, date, day_of_week,
-                               week, year, description, metric))
+                               week, year, description, metric, goal))
     
     return tuple_list
 
@@ -131,7 +140,7 @@ def tuple_list_to_df(tuple_list):
     """
     df = pd.DataFrame(
         tuple_list, columns = ['Name', 'Date', 'Day', 'Week',
-                               'Year', 'Description', 'Metric']
+                               'Year', 'Description', 'Metric', 'Goal']
     )
     
     return df
@@ -307,7 +316,8 @@ def add_zeros_before(df, date):
                            year, description, metric))
 
     df2 = pd.DataFrame(tuple_list)
-    df2.columns = ['Name', 'Date', 'Day', 'Week', 'Year', 'Description', 'Metric']
+    df2.columns = ['Name', 'Date', 'Day', 'Week', 'Year', 'Description',
+                   'Metric']
 
     df3 = pd.concat([df2, df], ignore_index=True)
 
@@ -369,6 +379,7 @@ def create_plots(df, color, color_low, color_high, color_heatmap_border,
     plotlist = []
 
     habit_name = get_habit_name(df)
+    goal = df['Goal'][0]
 
     df_complete_date_sums = get_complete_date_sums(df)
 
@@ -383,7 +394,7 @@ def create_plots(df, color, color_low, color_high, color_heatmap_border,
     plotlist.append(create_bar_metric_mean(df, color, font, save_dir))
     plotlist.append(create_bar_metric_sum(df, color, font, save_dir))
 
-    return ((habit_name, plotlist))
+    return ((habit_name, goal, plotlist))
 
 def get_date():
     """ Return date in yyyymmdd format
@@ -406,10 +417,11 @@ def create_pdf(plotslist, dir):
 
     for plot_group in plotslist:
         habit_name = plot_group[0]
-        file_list = plot_group[1]
+        goal = plot_group[1]
+        file_list = plot_group[2]
 
         c.setFont('HeiseiMin-W3', 16)
-        c.drawString(260, 800, habit_name)
+        c.drawString(50, 800, habit_name + ':   ' + goal)
 
         aspect0 = get_aspect(file_list[0])
         aspect1 = get_aspect(file_list[1])
@@ -489,7 +501,7 @@ def main():
 
     create_pdf(plotslist, save_dir)
 
-    delete_lists = [x[1] for x in plotslist]
+    delete_lists = [x[2] for x in plotslist]
     for delete_list in delete_lists:
         delete_files(delete_list)
    
