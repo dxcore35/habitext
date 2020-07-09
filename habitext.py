@@ -411,6 +411,9 @@ def fill_nonexisting_description(df):
     return np.where(df['existing_date'] == 0, '', df['Description'])
 
 def fill_nonexisting_columns(df):
+    """ Fill the day name, week, year, and description for dataframes
+    with newly added dates
+    """
     df = fill_nonexisting_name(df)
     df['Day'] = fill_nonexisting_day(df)
     df['Week'] = fill_nonexisting_week(df)
