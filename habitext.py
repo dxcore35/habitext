@@ -340,7 +340,8 @@ def add_zeros_between(df):
     return df
 
 def insert_missing_dates(df):
-    """ Adds 2 weeks of data with metric 0 to dataframe
+    """ Adds 2 weeks of data before the first date and adds any missing dates
+    to the dataframe
     """
     first_date = get_first_date(df)
     start_sunday = first_date - timedelta(days=(first_date.weekday() - 6) % 7, weeks=1)
@@ -350,6 +351,9 @@ def insert_missing_dates(df):
     return df
 
 def get_complete_date_sums(df):
+    """ Return dataframe with missing dates inserted and sums of the metric
+    for each date
+    """
     df_date_sums = metric_date_sum(df)
     df_complete_date_sums = insert_missing_dates(df_date_sums)
     order = ['Sat', 'Fri', 'Thu', 'Wed', 'Tue', 'Mon', 'Sun']
