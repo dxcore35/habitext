@@ -225,6 +225,8 @@ def filter_zero_metric(df):
     return df[df['Metric'] != 0]
 
 def save_plot(plt, df, size, suffix, save_dir):
+    """ Save given plot and return file path
+    """
     habit_name = get_habit_name(df)
     f = habit_name + suffix + '.png'
     file = save_dir+f
