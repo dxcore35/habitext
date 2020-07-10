@@ -235,7 +235,12 @@ def day_mean_df(df):
     sum_by_day = metric_date_sum(filter_zero_metric(df))
     mean_by_day = sum_by_day.groupby(['Day'])['Metric'].mean()
     df2 = pd.DataFrame({'Day' : mean_by_day.index,
-                        'Mean' : mean_by_day.values})
+                        'Mean Time' : mean_by_day.values})
+    order = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    df2['Day of Week'] = pd.Categorical(df2['Day'],
+                                        categories = order,
+                                        ordered = True)
+    df2['Name'] = get_habit_name(df)
     return df2
 
 def metric_sum_df(df):
@@ -419,14 +424,7 @@ def create_bar_metric_mean(df, color, font, save_dir):
     """ Create bar plot with mean value of metric by day of week
     and return tuple with file path and habit name
     """
-    df2 = day_mean_df(df)
-
-    order = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-    df2['Day of Week'] = pd.Categorical(df2['Day'],
-                                        categories = order,
-                                        ordered = True)
-
-    plt = (ggplot(pd.DataFrame(df2), aes(x = 'Day of Week', y = 'Mean'))
+    plt = (ggplot(df, aes(x = 'Day of Week', y = 'Mean Time'))
            + geom_col(fill = color)
            + ggtitle('Mean time by Day of Week')
            + theme_bw()
@@ -466,13 +464,14 @@ def create_plots(df, color, color_low, color_high, color_heatmap_border,
 
     df_complete_date_sums = get_complete_date_sums(df)
     df_week_sums = week_sum_df(df_complete_date_sums)
+    df_day_means = day_mean_df(df)
 
     plotlist.append(create_heatmap(df_complete_date_sums, color_low,
                                    color_high, color_heatmap_border,
                                    font, save_dir))
     plotlist.append(create_completion_num_graph(df_week_sums, color,
                                                 font, save_dir))
-    plotlist.append(create_bar_metric_mean(df, color, font, save_dir))
+    plotlist.append(create_bar_metric_mean(df_day_means, color, font, save_dir))
     plotlist.append(create_bar_metric_sum(df, color, font, save_dir))
 
     return plotlist
