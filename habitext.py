@@ -124,7 +124,7 @@ def get_description_metric(date_chunk):
 def datechunk_to_date(date_chunk):
     return pd.to_datetime(date_chunk[0][2:])
 
-def get_tuple_list(log):
+def log_to_tuple_list(log):
     """ Return tuple given log strings
     """
     tuple_list = []
@@ -161,7 +161,7 @@ def tuple_list_to_df(tuple_list):
 def df_from_log(log, metadata):
     """ Return dataframe for habit given its log and metadata
     """
-    tuple_list = get_tuple_list(log)
+    tuple_list = log_to_tuple_list(log)
     df = tuple_list_to_df(tuple_list)
     df['Name'] = name_from_metadata(metadata)
     df['Goal'] = goal_from_metadata(metadata)
