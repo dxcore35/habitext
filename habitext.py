@@ -258,6 +258,7 @@ def week_sum_df(df):
                                    label='left')['Metric'].sum()
     df_week_sums = pd.DataFrame({'Week': week_sums_series.index,
                                  'Sum': week_sums_series.values})
+    df_week_sums['Name'] = get_habit_name(df)
     
     return df_week_sums
 
@@ -400,15 +401,13 @@ def create_completion_num_graph(df, color, font, save_dir):
     """ Create bar plot with the number of days per week the
     habit is completed and return tuple with file path and habit name
     """
-    df_week_sums = week_sum_df(df)
-    
-    plt = (ggplot(df_week_sums, aes(x = 'Week', y = 'Sum'))
+    plt = (ggplot(df, aes(x = 'Week', y = 'Sum'))
            + geom_line()
            + coord_cartesian(ylim=[0,7])
            + scale_y_continuous(labels = list(range(0, 7)),
                                 breaks = list(range(0, 7)))
-           + scale_x_date(breaks = pd.date_range(min(df_week_sums['Week']),
-                                                 max(df_week_sums['Week']),
+           + scale_x_date(breaks = pd.date_range(min(df['Week']),
+                                                 max(df['Week']),
                                                  freq='W-SUN'))
            + ggtitle('Completed Days per Week')
            + theme_bw()
@@ -466,12 +465,13 @@ def create_plots(df, color, color_low, color_high, color_heatmap_border,
     plotlist = []
 
     df_complete_date_sums = get_complete_date_sums(df)
+    df_week_sums = week_sum_df(df_complete_date_sums)
 
     plotlist.append(create_heatmap(df_complete_date_sums, color_low,
                                    color_high, color_heatmap_border,
                                    font, save_dir))
-    plotlist.append(create_completion_num_graph(df_complete_date_sums,
-                                                color, font, save_dir))
+    plotlist.append(create_completion_num_graph(df_week_sums, color,
+                                                font, save_dir))
     plotlist.append(create_bar_metric_mean(df, color, font, save_dir))
     plotlist.append(create_bar_metric_sum(df, color, font, save_dir))
 
