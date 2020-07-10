@@ -229,20 +229,6 @@ def filter_zero_metric(df):
     """
     return df[df['Metric'] != 0]
 
-def day_mean_df(df):
-    """ Returns dataframe with the mean metric by day
-    """
-    sum_by_day = metric_date_sum(filter_zero_metric(df))
-    mean_by_day = sum_by_day.groupby(['Day'])['Metric'].mean()
-    df2 = pd.DataFrame({'Day' : mean_by_day.index,
-                        'Mean Time' : mean_by_day.values})
-    order = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-    df2['Day of Week'] = pd.Categorical(df2['Day'],
-                                        categories = order,
-                                        ordered = True)
-    df2['Name'] = get_habit_name(df)
-    return df2
-
 def metric_sum_df(df):
     """ Return dataframe with sum of metric by day
     """
@@ -250,22 +236,6 @@ def metric_sum_df(df):
     df_sums = pd.DataFrame({'Desc': sums_series.index,
                             'Sum': sums_series.values})
     return df_sums
-
-def week_sum_df(df):
-    """ Return dataframe with sum of metric per week
-    """
-    df['Metric'] = df['Metric'].clip(upper = 1)
-    
-    df.set_index('Date', inplace=True)
-    df.index = pd.to_datetime(df.index)
-    week_sums_series = df.resample('W-SUN',
-                                   closed = 'left',
-                                   label='left')['Metric'].sum()
-    df_week_sums = pd.DataFrame({'Week': week_sums_series.index,
-                                 'Days': week_sums_series.values})
-    df_week_sums['Name'] = get_habit_name(df)
-    
-    return df_week_sums
 
 def add_zeros_before(df, date):
     """ Add empty observations to the dataframe from the Sunday
@@ -376,6 +346,36 @@ def get_complete_date_sums(df):
                                                   categories = order)
     
     return df_complete_date_sums
+
+def week_sum_df(df):
+    """ Return dataframe with sum of metric per week
+    """
+    df['Metric'] = df['Metric'].clip(upper = 1)
+    
+    df.set_index('Date', inplace=True)
+    df.index = pd.to_datetime(df.index)
+    week_sums_series = df.resample('W-SUN',
+                                   closed = 'left',
+                                   label='left')['Metric'].sum()
+    df_week_sums = pd.DataFrame({'Week': week_sums_series.index,
+                                 'Days': week_sums_series.values})
+    df_week_sums['Name'] = get_habit_name(df)
+    
+    return df_week_sums
+
+def day_mean_df(df):
+    """ Returns dataframe with the mean metric by day
+    """
+    sum_by_day = metric_date_sum(filter_zero_metric(df))
+    mean_by_day = sum_by_day.groupby(['Day'])['Metric'].mean()
+    df2 = pd.DataFrame({'Day' : mean_by_day.index,
+                        'Mean Time' : mean_by_day.values})
+    order = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    df2['Day of Week'] = pd.Categorical(df2['Day'],
+                                        categories = order,
+                                        ordered = True)
+    df2['Name'] = get_habit_name(df)
+    return df2
 
 def description_sum_df(df):
     df_sums = metric_sum_df(df)
