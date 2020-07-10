@@ -456,9 +456,6 @@ def create_plots(df, color, color_low, color_high, color_heatmap_border,
     """
     plotlist = []
 
-    habit_name = get_habit_name(df)
-    goal = df['Goal'][0]
-
     df_complete_date_sums = get_complete_date_sums(df)
 
     plotlist.append(
@@ -472,7 +469,7 @@ def create_plots(df, color, color_low, color_high, color_heatmap_border,
     plotlist.append(create_bar_metric_mean(df, color, font, save_dir))
     plotlist.append(create_bar_metric_sum(df, color, font, save_dir))
 
-    return ((habit_name, goal, plotlist))
+    return plotlist
 
 def get_date():
     """ Return date in yyyymmdd format
@@ -557,8 +554,14 @@ def main():
     plotslist = []
 
     for df in df_list:
-        plotslist.append(create_plots(df, color, color_low, color_high,
-                         color_heatmap_border, font, save_dir))
+        plotslist.append(
+            (
+                get_habit_name(df),
+                df['Goal'][0],
+                create_plots(df, color, color_low, color_high,
+                             color_heatmap_border, font, save_dir)
+            )
+        )
 
     create_pdf(plotslist, save_dir)
 
