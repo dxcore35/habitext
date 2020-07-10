@@ -377,6 +377,21 @@ def get_complete_date_sums(df):
     
     return df_complete_date_sums
 
+def description_sum_df(df):
+    df_sums = metric_sum_df(df)
+    df_sums['Sum'] = df_sums['Sum'] / 60
+    df_sums.columns = ['Desc', 'Hours']
+    
+    df_sums['Desc'] = df_sums['Desc'].str.wrap(8)
+
+    order = df_sums.sort_values(by = ['Hours'])['Desc']
+    df_sums['Description'] = pd.Categorical(df_sums['Desc'],
+                                            categories=order,
+                                            ordered=True)
+    df_sums['Name'] = get_habit_name(df)
+    
+    return df_sums
+
 def save_plot(plt, df, size, suffix, save_dir):
     """ Save given plot and return file path
     """
@@ -436,18 +451,7 @@ def create_bar_metric_sum(df, color, font, save_dir):
     """ Create bar plot with total time spent for each description
     and return tuple with file path and habit name
     """
-    df_sums = metric_sum_df(df)
-    df_sums['Sum'] = df_sums['Sum'] / 60
-    df_sums.columns = ['Desc', 'Hours']
-    
-    df_sums['Desc'] = df_sums['Desc'].str.wrap(8)
-
-    order = df_sums.sort_values(by = ['Hours'])['Desc']
-    df_sums['Description'] = pd.Categorical(df_sums['Desc'],
-                                            categories=order,
-                                            ordered=True)
-
-    plt = (ggplot(pd.DataFrame(df_sums), aes(x = 'Description', y = 'Hours'))
+    plt = (ggplot(df, aes(x = 'Description', y = 'Hours'))
            + geom_col(fill = color)
            + coord_flip()
            + ggtitle('Sum time per Description')
@@ -465,6 +469,7 @@ def create_plots(df, color, color_low, color_high, color_heatmap_border,
     df_complete_date_sums = get_complete_date_sums(df)
     df_week_sums = week_sum_df(df_complete_date_sums)
     df_day_means = day_mean_df(df)
+    df_description_sums = description_sum_df(df)
 
     plotlist.append(create_heatmap(df_complete_date_sums, color_low,
                                    color_high, color_heatmap_border,
@@ -472,7 +477,7 @@ def create_plots(df, color, color_low, color_high, color_heatmap_border,
     plotlist.append(create_completion_num_graph(df_week_sums, color,
                                                 font, save_dir))
     plotlist.append(create_bar_metric_mean(df_day_means, color, font, save_dir))
-    plotlist.append(create_bar_metric_sum(df, color, font, save_dir))
+    plotlist.append(create_bar_metric_sum(df_description_sums, color, font, save_dir))
 
     return plotlist
 
