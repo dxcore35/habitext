@@ -50,7 +50,11 @@ def hhmm_to_mm(time_str):
 def text_after_bullet(s):
     """ Return string after '- ' in given string
     """
-    return s.partition('- ')[2]
+    t = s.partition('- ')[2]
+    if t.endswith(' '):
+        print(f'### Trailing Space at {s}')
+        t = t.rstrip()
+    return t
 
 def get_day_of_week(date):
     """ Return day of week given a date
