@@ -224,6 +224,14 @@ def filter_zero_metric(df):
     """
     return df[df['Metric'] != 0]
 
+def save_plot(plt, df, size, suffix, save_dir):
+    habit_name = get_habit_name(df)
+    f = habit_name + suffix + '.png'
+    file = save_dir+f
+    ggsave(filename=file, plot=plt, device = 'png',
+           width = size[0], height = size[1], dpi=300)
+    return file
+
 def create_heatmap(df, color_low, color_high, color_heatmap_border, font, save_dir):
     """ Create tile plot and return tuple with file path and habit name
     """
@@ -237,12 +245,7 @@ def create_heatmap(df, color_low, color_high, color_heatmap_border, font, save_d
            + theme_bw()
            + theme(figure_size = (6, 6), text=element_text(family=font, size = 13)))
 
-    habit_name = get_habit_name(df)
-    f = habit_name + '_heatmap' + '.png'
-    file = save_dir+f
-    ggsave(filename=file, plot=plt, device = 'png', height = 2, width = 2, dpi=300)
-
-    return file
+    return save_plot(plt, df, (2,2), '_heatmap', save_dir)
 
 def day_mean_df(df):
     """ Returns dataframe with the mean metric by day
@@ -270,12 +273,7 @@ def create_bar_metric_mean(df, color, font, save_dir):
            + theme_bw()
            + theme(figure_size = (6, 6), text=element_text(family=font, size = 13)))
 
-    habit_name = get_habit_name(df)
-    f = habit_name + '_meanbar' + '.png'
-    file = save_dir+f
-    ggsave(filename=file, plot=plt, device = 'png', dpi=300)
-
-    return file
+    return save_plot(plt, df, (6, 6), '_meanbar', save_dir)
 
 def metric_sum_df(df):
     """ Return dataframe with sum of metric by day
@@ -307,12 +305,7 @@ def create_bar_metric_sum(df, color, font, save_dir):
            + theme_bw()
            + theme(figure_size = (6, 6), text=element_text(family=font, size = 13)))
 
-    habit_name = get_habit_name(df)
-    f = habit_name + '_sumbar' + '.png'
-    file = save_dir+f
-    ggsave(filename=file, plot=plt, device = 'png', dpi=300)
-
-    return file
+    return save_plot(plt, df, (6, 6), '_sumbar', save_dir)
 
 def week_sum_df(df):
     """ Return dataframe with sum of metric per week
@@ -347,12 +340,7 @@ def create_completion_num_graph(df, color, font, save_dir):
            + theme_bw()
            + theme(figure_size = (6, 6), text=element_text(family=font, size = 13)))
     
-    habit_name = get_habit_name(df)
-    f = habit_name + '_completion' + '.png'
-    file = save_dir+f
-    ggsave(filename=file, plot=plt, device = 'png', dpi=300)
-    
-    return file
+    return save_plot(plt, df, (6, 6), '_completion', save_dir)
 
 def add_zeros_before(df, date):
     """ Add empty observations to the dataframe from the Sunday
