@@ -200,6 +200,20 @@ def get_df_list(filelist, dir):
 
     return df_list
 
+def get_plot_list(df_list, color, color_low, color_high,
+                  color_heatmap_border, font, save_dir):
+    plotslist = []
+    for df in df_list:
+        plotslist.append(
+            (
+                get_habit_name(df),
+                df['Goal'][0],
+                create_plots(df, color, color_low, color_high,
+                             color_heatmap_border, font, save_dir)
+            )
+        )
+    return plotslist
+
 def metric_date_sum(df):
     """ Return dataframe with sum of metric by day
     """
@@ -548,17 +562,8 @@ def main():
 
     df_list = get_df_list(habitlist, habit_dir)
 
-    plotslist = []
-
-    for df in df_list:
-        plotslist.append(
-            (
-                get_habit_name(df),
-                df['Goal'][0],
-                create_plots(df, color, color_low, color_high,
-                             color_heatmap_border, font, save_dir)
-            )
-        )
+    plotslist = get_plot_list(df_list, color, color_low, color_high,
+                              color_heatmap_border, font, save_dir)
 
     create_pdf(plotslist, save_dir)
 
