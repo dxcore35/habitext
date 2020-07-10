@@ -458,14 +458,11 @@ def create_plots(df, color, color_low, color_high, color_heatmap_border,
 
     df_complete_date_sums = get_complete_date_sums(df)
 
-    plotlist.append(
-        create_heatmap(df_complete_date_sums, color_low, color_high, 
-                       color_heatmap_border, font, save_dir)
-    )
-    plotlist.append(
-        create_completion_num_graph(df_complete_date_sums, color,
-                                     font, save_dir)
-    )
+    plotlist.append(create_heatmap(df_complete_date_sums, color_low,
+                                   color_high, color_heatmap_border,
+                                   font, save_dir))
+    plotlist.append(create_completion_num_graph(df_complete_date_sums,
+                                                color, font, save_dir))
     plotlist.append(create_bar_metric_mean(df, color, font, save_dir))
     plotlist.append(create_bar_metric_sum(df, color, font, save_dir))
 
