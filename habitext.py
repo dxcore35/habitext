@@ -212,6 +212,9 @@ def get_df_list(filelist, dir):
 
 def get_plot_list(df_list, color, color_low, color_high,
                   color_heatmap_border, font, save_dir):
+    """ Return list with tuple of form
+    (habit_name, goal, plots_file_paths)
+    """
     plotslist = []
     for df in df_list:
         plotslist.append(
