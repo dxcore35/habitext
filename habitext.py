@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
+import configparser
 from plotnine import *
 from datetime import date, datetime, timedelta
 from reportlab.pdfgen import canvas
@@ -560,14 +561,17 @@ def main():
     """Create DataFrame from markdown files, split dataframes
     by habit name, create plots, and add plots to PDF
     """
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    
     # Directories need to exist
-    habit_dir = "/habits/"
-    save_dir = "/habits/reports/"
-    color_heatmap_border = "black"
-    color_low = "white"
-    color_high = "green"
-    color = "green"
-    font = "Noto Sans CJK JP"
+    habit_dir = config.get('Directories', 'md_dir')
+    save_dir = config.get('Directories', 'pdf_save_dir')
+    color_heatmap_border = config.get('Plots', 'color_heatmap_border')
+    color_low = config.get('Plots', 'color_low')
+    color_high = config.get('Plots', 'color_high')
+    color = config.get('Plots', 'color')
+    font = config.get('Plots', 'font')
 
     habitlist = md_file_list(habit_dir)
 
