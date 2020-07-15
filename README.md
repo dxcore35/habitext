@@ -21,6 +21,7 @@ The file name can by anything, but the order of the habits in the PDF is determi
 # Metadata
 
 Name: Habit1
+Goal: Goal for habit1
 
 # Log
 
