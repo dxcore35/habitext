@@ -1,7 +1,7 @@
 # Metadata
 
 Name: Exercise
-Goal: Go Outside Every Day
+Goal: Every day
 
 # Log
 
@@ -17,3 +17,6 @@ Goal: Go Outside Every Day
 - 2020-07-06
   - Running
     - 00:25
+- 2020-07-14
+  - Walking
+    - 00:40

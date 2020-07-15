@@ -1,7 +1,7 @@
 # Metadata
 
 Name: Programming
-Goal: Commit Every Day
+Goal: 5 Hours per week
 
 # Log
 
