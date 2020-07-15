@@ -193,8 +193,8 @@ def log_from_lines(lines):
     return log
 
 def get_df_list(filelist, dir):
-    """ Given a list of markdown files their directory
-    returns a list of dataframes for each file
+    """ Return list of dataframes with the dataframe for
+    each file from the filelist
     """
     df_list = []
 
