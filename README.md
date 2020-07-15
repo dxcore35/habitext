@@ -45,14 +45,14 @@ Goal: Goal for habit1
 ```bash
 pip install pandas plotnine reportlab
 ```
-3. Clone and update settings
+3. Clone Repository
 ```bash
 git clone https://github.com/ryushida/habitext.git
-cd habitext
-# Update directory and font settings in habitext.py
 ```
-4. Run script
+4. Update configuration in config.ini
+5. Run script
 ```bash
+cd habitext
 python habitext.py
 ```
 
@@ -62,11 +62,11 @@ python habitext.py
 2. Clone and update settings
 ```bash
 git clone https://github.com/ryushida/habitext.git
-cd habitext
-# Update directory and font settings in habitext.py
 ```
+2. Update configuration in config.ini
 3. Build Docker Container
 ```bash
+cd habitext
 docker build -t habitext .
 ```
 3. Run script in Docker Container
