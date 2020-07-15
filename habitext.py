@@ -414,7 +414,8 @@ class Plotter():
             + scale_fill_gradient(low = color_low, high = color_high)
             + ggtitle('Heatmap')
             + theme_bw()
-            + theme(figure_size = (6, 6), text=element_text(family=self.font, size = 13)))
+            + theme(figure_size = (6, 6),
+                    text=element_text(family=self.font, size = 13)))
 
         return save_plot(plt, df, (2,2), '_heatmap', self.save_dir)
 
@@ -432,7 +433,8 @@ class Plotter():
                                                   freq='W-SUN'))
             + ggtitle('Completed Days per Week')
             + theme_bw()
-            + theme(figure_size = (6, 6), text=element_text(family=self.font, size = 13)))
+            + theme(figure_size = (6, 6),
+                    text=element_text(family=self.font, size = 13)))
         
         return save_plot(plt, df, (6, 6), '_completion', self.save_dir)
     
@@ -444,7 +446,8 @@ class Plotter():
             + geom_col(fill = self.color)
             + ggtitle('Mean time by Day of Week')
             + theme_bw()
-            + theme(figure_size = (6, 6), text=element_text(family=self.font, size = 13)))
+            + theme(figure_size = (6, 6),
+                    text=element_text(family=self.font, size = 13)))
 
         return save_plot(plt, df, (6, 6), '_meanbar', self.save_dir)
     
@@ -457,7 +460,8 @@ class Plotter():
             + coord_flip()
             + ggtitle('Sum time per Description')
             + theme_bw()
-            + theme(figure_size = (6, 6), text=element_text(family=self.font, size = 13)))
+            + theme(figure_size = (6, 6),
+                    text=element_text(family=self.font, size = 13)))
 
         return save_plot(plt, df, (6, 6), '_sumbar', self.save_dir)
 
