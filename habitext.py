@@ -2,13 +2,13 @@ import os
 import pandas as pd
 import numpy as np
 import configparser
-from plotnine import *
 from datetime import date, datetime, timedelta
 from reportlab.pdfgen import canvas
 from reportlab.lib import utils
 from reportlab.platypus import Image
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.cidfonts import UnicodeCIDFont
+import plots
 
 def name_from_metadata(metadata):
     """ Returns habit name given metadata string
@@ -400,105 +400,26 @@ def description_sum_df(df):
     
     return df_sums
 
-class Plotter():
-    
-    def __init__(self, color, font, save_dir):
-        self.color = color
-        self.font = font
-        self.save_dir = save_dir
-            
-    def create_heatmap(self, df, color_low, color_high, color_heatmap_border):
-        """ Create tile plot and return tuple with file path and habit name
-        """
-        plt = (ggplot(df, aes(x = 'Week', y = 'Day', fill = 'Metric'))
-            + geom_tile(aes(width = 0.95, height = 0.95),
-                        color = color_heatmap_border, size = 1)
-            + scale_x_continuous(breaks = df['Week'].unique())
-            + coord_equal()
-            + scale_fill_gradient(low = color_low, high = color_high)
-            + ggtitle('Heatmap')
-            + theme_bw()
-            + theme(figure_size = (6, 6),
-                    text=element_text(family=self.font, size = 13)))
-
-        return save_plot(plt, df, (2,2), '_heatmap', self.save_dir)
-
-    def create_completion_num_graph(self, df):
-        """ Create bar plot with the number of days per week the
-        habit is completed and return tuple with file path and habit name
-        """
-        plt = (ggplot(df, aes(x = 'Week', y = 'Days'))
-            + geom_line()
-            + coord_cartesian(ylim=[0,7])
-            + scale_y_continuous(labels = list(range(0, 7)),
-                                 breaks = list(range(0, 7)))
-            + scale_x_date(breaks = pd.date_range(min(df['Week']),
-                                                  max(df['Week']),
-                                                  freq='W-SUN'))
-            + ggtitle('Completed Days per Week')
-            + theme_bw()
-            + theme(figure_size = (6, 6),
-                    text=element_text(family=self.font, size = 13)))
-        
-        return save_plot(plt, df, (6, 6), '_completion', self.save_dir)
-    
-    def create_bar_metric_mean(self, df):
-        """ Create bar plot with mean value of metric by day of week
-        and return tuple with file path and habit name
-        """
-        plt = (ggplot(df, aes(x = 'Day of Week', y = 'Mean Time'))
-            + geom_col(fill = self.color)
-            + ggtitle('Mean time by Day of Week')
-            + theme_bw()
-            + theme(figure_size = (6, 6),
-                    text=element_text(family=self.font, size = 13)))
-
-        return save_plot(plt, df, (6, 6), '_meanbar', self.save_dir)
-    
-    def create_bar_metric_sum(self, df):
-        """ Create bar plot with total time spent for each description
-        and return tuple with file path and habit name
-        """
-        plt = (ggplot(df, aes(x = 'Description', y = 'Hours'))
-            + geom_col(fill = self.color)
-            + coord_flip()
-            + ggtitle('Sum time per Description')
-            + theme_bw()
-            + theme(figure_size = (6, 6),
-                    text=element_text(family=self.font, size = 13)))
-
-        return save_plot(plt, df, (6, 6), '_sumbar', self.save_dir)
-
-def save_plot(plt, df, size, suffix, save_dir):
-    """ Save given plot and return file path
-    """
-    habit_name = get_habit_name(df)
-    f = habit_name + suffix + '.png'
-    file = save_dir+f
-    ggsave(filename=file, plot=plt, device = 'png',
-           width = size[0], height = size[1], dpi=300)
-    return file
-
-
 def create_plots(df, color, color_low, color_high, color_heatmap_border,
                  font, save_dir):
     """ Create each plot and return list with file paths
     """
     plotlist = []
-    
-    plotter = Plotter(color, font, save_dir)
 
     df_complete_date_sums = get_complete_date_sums(df)
-    plotlist.append(plotter.create_heatmap(df_complete_date_sums, color_low,
-                                   color_high, color_heatmap_border))
+    habit_name = get_habit_name(df_complete_date_sums)
+    plotlist.append(plots.create_heatmap(df_complete_date_sums, habit_name, color_low,
+                                   color_high, color_heatmap_border,
+                                   font, save_dir))
     
     df_week_sums = week_sum_df(df_complete_date_sums)
     df_day_means = day_mean_df(df)
     df_description_sums = description_sum_df(df)
-    
-    plotlist.append(plotter.create_completion_num_graph(df_week_sums))
-    plotlist.append(plotter.create_bar_metric_mean(df_day_means))
-    plotlist.append(plotter.create_bar_metric_sum(df_description_sums))
+
+    plotlist.append(plots.create_completion_num_graph(df_week_sums, habit_name, color,
+                                                font, save_dir))
+    plotlist.append(plots.create_bar_metric_mean(df_day_means, habit_name, color, font, save_dir))
+    plotlist.append(plots.create_bar_metric_sum(df_description_sums, habit_name, color, font, save_dir))
 
     return plotlist
 
